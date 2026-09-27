@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="12" fill="#221B14" />
+  <g
+    fill="none"
+    stroke="#ECD19E"
+    stroke-width="1"
+    opacity="0.45"
+  >
+    <rect x="6" y="6" width="52" height="52" rx="7" />
+    <rect x="9.5" y="9.5" width="45" height="45" rx="5" />
+  </g>
+  <g fill="#D1B079">
+    <circle cx="32" cy="12.5" r="2.4" />
+    <circle cx="12.5" cy="32" r="2.4" />
+    <circle cx="32" cy="51.5" r="2.4" />
+    <circle cx="51.5" cy="32" r="2.4" />
+  </g>
+  <text
+    x="32"
+    y="43"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="34"
+    font-weight="700"
+    fill="#FAF7F2"
+  >ض</text>
+  <path
+    d="M20 46.5h24"
+    stroke="#826139"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+</svg>

@@ -1,0 +1,568 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   Typefaces — self-hosted, split into arabic / latin subsets.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Cairo Arabic";
+  font-style: normal;
+  font-weight: 400 1000;
+  font-display: swap;
+  src: url("/fonts/cairo-arabic-normal-400_1000.woff2") format("woff2");
+  unicode-range: var(--range-arabic);
+}
+@font-face {
+  font-family: "Cairo Arabic";
+  font-style: normal;
+  font-weight: 400 1000;
+  font-display: swap;
+  src: url("/fonts/cairo-latin-normal-400_1000.woff2") format("woff2");
+  unicode-range: var(--range-latin);
+}
+
+@font-face {
+  font-family: "Noto Kufi Arabic";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/fonts/kufi-arabic-normal-400_900.woff2") format("woff2");
+  unicode-range: var(--range-arabic);
+}
+@font-face {
+  font-family: "Noto Kufi Arabic";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/fonts/kufi-latin-normal-400_900.woff2") format("woff2");
+  unicode-range: var(--range-latin);
+}
+
+@font-face {
+  font-family: "Amiri Arabic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/amiri-arabic-normal-400.woff2") format("woff2");
+  unicode-range: var(--range-arabic);
+}
+@font-face {
+  font-family: "Amiri Arabic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/amiri-latin-normal-400.woff2") format("woff2");
+  unicode-range: var(--range-latin);
+}
+@font-face {
+  font-family: "Amiri Arabic";
+  font-style: bold;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/amiri-arabic-normal-700.woff2") format("woff2");
+  unicode-range: var(--range-arabic);
+}
+@font-face {
+  font-family: "Amiri Arabic";
+  font-style: bold;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/amiri-latin-normal-700.woff2") format("woff2");
+  unicode-range: var(--range-latin);
+}
+@font-face {
+  font-family: "Amiri Arabic";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/amiri-arabic-italic-400.woff2") format("woff2");
+  unicode-range: var(--range-arabic);
+}
+
+@font-face {
+  font-family: "Inter Latin";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/inter-latin-normal-300_700.woff2") format("woff2");
+  unicode-range: var(--range-latin);
+}
+
+:root {
+  --range-arabic: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891,
+    U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E,
+    U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22,
+    U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42,
+    U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57,
+    U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A,
+    U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B,
+    U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+  --range-latin: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ==========================================================================
+   Palette — sampled directly from the original deck (see Assets/).
+   Parchment grounds, muted gold/bronze accents, deep ink, one night tone.
+   ========================================================================== */
+
+:root {
+  /* Parchment / ivory — the deck's dominant ground (#FAF7F2 → #E9E0D1) */
+  --paper: oklch(0.976 0.008 85);
+  --paper-raised: oklch(0.99 0.006 85);
+  --paper-sunk: oklch(0.941 0.014 80);
+  --paper-line: oklch(0.885 0.018 78);
+
+  /* Ink — warm brown-charcoal lifted from the deck's body text (#534234) */
+  --ink: oklch(0.245 0.018 65);
+  --ink-soft: oklch(0.42 0.022 68);
+  --ink-muted: oklch(0.5 0.024 72);
+  --ink-faint: oklch(0.515 0.02 76);
+
+  /* Night — the deck's dark slides (#181818 warmed to keep it Arabic) */
+  --night: oklch(0.185 0.012 70);
+  --night-raised: oklch(0.235 0.014 68);
+  --night-line: oklch(0.32 0.016 66);
+  --night-text: oklch(0.955 0.01 84);
+  --night-muted: oklch(0.74 0.016 80);
+
+  /* Gold / bronze — #ECD19E → #B38D58 → #826139 */
+  --gold-100: oklch(0.945 0.038 88);
+  --gold-200: oklch(0.885 0.072 88);
+  --gold-300: oklch(0.795 0.098 82);
+  --gold-400: oklch(0.685 0.098 74);
+  --gold-500: oklch(0.552 0.078 66);
+  --gold-600: oklch(0.44 0.058 60);
+
+  /* Section accents — each section owns one, so no two look alike */
+  --accent-tech: oklch(0.52 0.108 190); /* deep teal — technology */
+  --accent-tech-soft: oklch(0.94 0.03 190);
+  --accent-star: oklch(0.44 0.09 275); /* indigo — discovery / night sky */
+  --accent-star-soft: oklch(0.955 0.02 275);
+  --accent-olive: oklch(0.5 0.06 130); /* olive-bronze — history */
+  --accent-olive-soft: oklch(0.945 0.025 130);
+
+  --shadow-lift: 0 1px 2px oklch(0.245 0.018 65 / 0.05),
+    0 8px 24px -12px oklch(0.245 0.018 65 / 0.18);
+  --shadow-deep: 0 2px 4px oklch(0.245 0.018 65 / 0.06),
+    0 24px 60px -24px oklch(0.245 0.018 65 / 0.28);
+
+  /* shadcn bridge */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper-raised);
+  --card-foreground: var(--ink);
+  --popover: var(--paper-raised);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-sunk);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-sunk);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--paper-sunk);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.55 0.19 27);
+  --border: var(--paper-line);
+  --input: var(--paper-line);
+  --ring: var(--gold-400);
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-paper-sunk: var(--paper-sunk);
+  --color-paper-line: var(--paper-line);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-night: var(--night);
+  --color-night-raised: var(--night-raised);
+  --color-night-line: var(--night-line);
+  --color-night-text: var(--night-text);
+  --color-night-muted: var(--night-muted);
+  --color-gold-100: var(--gold-100);
+  --color-gold-200: var(--gold-200);
+  --color-gold-300: var(--gold-300);
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+  --color-gold-600: var(--gold-600);
+  --color-accent-tech: var(--accent-tech);
+  --color-accent-tech-soft: var(--accent-tech-soft);
+  --color-accent-star: var(--accent-star);
+  --color-accent-star-soft: var(--accent-star-soft);
+  --color-accent-olive: var(--accent-olive);
+  --color-accent-olive-soft: var(--accent-olive-soft);
+
+  --font-sans: "Cairo Arabic", system-ui, sans-serif;
+  --font-display: "Noto Kufi Arabic", "Cairo Arabic", system-ui, sans-serif;
+  --font-serif: "Amiri Arabic", "Amiri", serif;
+  --font-latin: "Inter Latin", "Inter", system-ui, sans-serif;
+
+  --shadow-lift: var(--shadow-lift);
+  --shadow-deep: var(--shadow-deep);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.6);
+  --radius-2xl: calc(var(--radius) * 2.2);
+  --radius-3xl: calc(var(--radius) * 3);
+
+  /* ---------------------------------------------------------------- */
+  /*  Stage scale                                                      */
+  /*                                                                   */
+  /*  One set of variables drives every size on stage. Retuning them    */
+  /*  per viewport *height* (below) retunes the whole deck at once, so a */
+  /*  1280×720 projector and a 1920×1080 screen both get a composition   */
+  /*  that fits without scrolling — instead of five breakpoints scattered */
+  /*  across five components.                                           */
+  /*                                                                   */
+  /*  Each step carries a `vh` term next to its `vw` one. A slide is     */
+  /*  limited by the space *above and below* it, so a 1920×1080 screen   */
+  /*  has height to spend that a 1920×720 one does not — and type that   */
+  /*  tracks only width ends up the same size on both, which is what     */
+  /*  made the deck read as small on a large screen.                     */
+  /* ---------------------------------------------------------------- */
+  --fs-display-xl: clamp(2.3rem, 1.3rem + 3.1vw + 0.5vh, 4.6rem);
+  --fs-display-lg: clamp(1.7rem, 1.1rem + 1.95vw + 0.35vh, 3.4rem);
+  --fs-display-md: clamp(1.25rem, 0.95rem + 1.05vw + 0.2vh, 2.15rem);
+  --fs-display-sm: clamp(1.05rem, 0.9rem + 0.62vw + 0.12vh, 1.5rem);
+  --fs-body-lg: clamp(1rem, 0.9rem + 0.36vw + 0.12vh, 1.42rem);
+  --fs-body: clamp(0.87rem, 0.81rem + 0.22vw + 0.1vh, 1.12rem);
+  --fs-body-sm: clamp(0.79rem, 0.75rem + 0.15vw + 0.07vh, 0.98rem);
+  --fs-micro: clamp(0.68rem, 0.66rem + 0.09vw + 0.03vh, 0.77rem);
+  --fs-scripture: clamp(1.05rem, 0.86rem + 0.7vw + 0.18vh, 1.78rem);
+
+  --lh-scripture: 2.1;
+
+  /* Vertical rhythm, in viewport-height units so it never outgrows the
+     space the rails leave behind. */
+  --sp-page: clamp(0.75rem, 0.45rem + 1.1vh, 1.5rem);
+  --sp-stage: clamp(0.9rem, 0.5rem + 1.4vh, 1.75rem);
+  --sp-block: clamp(0.6rem, 0.35rem + 0.9vh, 1.25rem);
+  --sp-tight: clamp(0.4rem, 0.25rem + 0.5vh, 0.75rem);
+
+  --numeral-size: clamp(2.1rem, 1.6rem + 1.9vw, 3.3rem);
+}
+
+/* Short viewports: step the whole deck down a notch. The `vh` terms are kept
+   here too, so an 860px-tall screen still reads larger than a 740px one even
+   though both are capped by the same media query. */
+@media (max-height: 880px) {
+  :root {
+    --fs-display-xl: clamp(2rem, 1.2rem + 2.7vw + 0.4vh, 3.7rem);
+    --fs-display-lg: clamp(1.5rem, 1rem + 1.7vw + 0.28vh, 2.8rem);
+    --fs-display-md: clamp(1.15rem, 0.9rem + 0.88vw + 0.16vh, 1.82rem);
+    --fs-display-sm: clamp(1rem, 0.88rem + 0.52vw + 0.1vh, 1.36rem);
+    --fs-body-lg: clamp(0.95rem, 0.88rem + 0.3vw + 0.1vh, 1.26rem);
+    --fs-body: clamp(0.84rem, 0.8rem + 0.18vw + 0.085vh, 1.05rem);
+    --fs-body-sm: clamp(0.77rem, 0.74rem + 0.12vw + 0.06vh, 0.94rem);
+    --fs-micro: clamp(0.66rem, 0.64rem + 0.07vw + 0.025vh, 0.74rem);
+    --fs-scripture: clamp(1rem, 0.85rem + 0.5vw + 0.15vh, 1.5rem);
+    --lh-scripture: 1.95;
+    --numeral-size: clamp(1.8rem, 1.4rem + 1.3vw + 0.2vh, 2.8rem);
+  }
+}
+
+@media (max-height: 760px) {
+  /* A row's second line restates the detail pane beside it. On a 720p
+     projector six rows have to fit, so the pane carries the words alone. */
+  .spine-headline {
+    display: none;
+  }
+
+  :root {
+    --fs-display-xl: clamp(1.85rem, 1.15rem + 2.5vw + 0.3vh, 3.1rem);
+    --fs-display-lg: clamp(1.4rem, 0.95rem + 1.55vw + 0.22vh, 2.4rem);
+    --fs-display-md: clamp(1.08rem, 0.88rem + 0.75vw + 0.13vh, 1.6rem);
+    --fs-display-sm: clamp(0.95rem, 0.86rem + 0.44vw + 0.08vh, 1.22rem);
+    --fs-body-lg: clamp(0.9rem, 0.85rem + 0.24vw + 0.08vh, 1.14rem);
+    --fs-body: clamp(0.8rem, 0.78rem + 0.14vw + 0.07vh, 0.98rem);
+    --fs-body-sm: clamp(0.74rem, 0.72rem + 0.09vw + 0.05vh, 0.88rem);
+    --fs-micro: clamp(0.64rem, 0.63rem + 0.055vw + 0.02vh, 0.71rem);
+    --fs-scripture: clamp(0.95rem, 0.84rem + 0.44vw + 0.12vh, 1.32rem);
+    --lh-scripture: 1.85;
+    --numeral-size: clamp(1.6rem, 1.3rem + 1.05vw + 0.16vh, 2.3rem);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    font-feature-settings: "ss01", "ss02";
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Arabic sits on a taller, looser rhythm than Latin at the same size. */
+  :lang(ar),
+  [dir="rtl"] {
+    line-height: 1.85;
+  }
+
+  /* Arabic never takes italic — synthesised obliques break the joins. */
+  [dir="rtl"] em,
+  [dir="rtl"] i {
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--gold-500);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--gold-200);
+    color: var(--ink);
+  }
+
+  /* Latin runs embedded in Arabic copy. */
+  .latin {
+    font-family: var(--font-latin);
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-feature-settings: normal;
+  }
+}
+
+@layer components {
+  /* The double rule that frames every slide of the original deck. */
+  .ornament-frame {
+    position: relative;
+  }
+  .ornament-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid color-mix(in oklab, var(--gold-500) 30%, transparent);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .ornament-frame::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1px solid color-mix(in oklab, var(--gold-500) 16%, transparent);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+
+  /* Kicker: the small letter-spaced label above a section title. */
+  .kicker {
+    font-family: var(--font-display);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    line-height: 1.4;
+  }
+
+  .stage-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.32;
+    letter-spacing: -0.005em;
+  }
+
+  .scripture {
+    font-family: var(--font-serif);
+    line-height: var(--lh-scripture);
+    letter-spacing: 0;
+  }
+
+  /* The stage frame: a hairline edge so the deck reads as a "page" without
+     boxing the content in. */
+  .stage-page {
+    padding-inline: clamp(1rem, 0.5rem + 1.6vw, 2.25rem);
+    padding-block: var(--sp-page);
+  }
+}
+
+/* ==========================================================================
+   Small screens — the deck stops being a fixed frame and becomes a page
+   ==========================================================================
+
+   A section is built to fit exactly one viewport: it carries `min-h-0
+   flex-1 overflow-hidden` so that on a projector it can never push the rails
+   off the screen. Below the presentation breakpoint that same contract would
+   silently cut content off the bottom of a phone, because the section is no
+   longer taller than the screen to begin with.
+
+   `min-height: 0` is the single declaration that allows the shrink, so
+   putting it back to `auto` restores the automatic minimum size — the section
+   can no longer be shorter than its content, the stage grows, and the page
+   scrolls normally. Nothing else about the layout changes. */
+
+@media (width < 64rem) {
+  .stage-page,
+  .stage-page [class*="min-h-0"] {
+    min-height: auto;
+  }
+}
+
+@layer utilities {
+  /* Type scale — every value comes from the `--fs-*` variables so the
+     `@media (max-height)` retune above reaches all of it at once. */
+  .type-display-xl {
+    font-size: var(--fs-display-xl);
+  }
+  .type-display-lg {
+    font-size: var(--fs-display-lg);
+  }
+  .type-display-md {
+    font-size: var(--fs-display-md);
+  }
+  .type-display-sm {
+    font-size: var(--fs-display-sm);
+  }
+  .type-body-lg {
+    font-size: var(--fs-body-lg);
+  }
+  .type-body {
+    font-size: var(--fs-body);
+  }
+  .type-body-sm {
+    font-size: var(--fs-body-sm);
+  }
+  .type-micro {
+    font-size: var(--fs-micro);
+  }
+  .type-scripture {
+    font-size: var(--fs-scripture);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Parchment tooth: a barely-there grain so large flats are not dead. */
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+
+  .balance {
+    text-wrap: balance;
+  }
+  .pretty {
+    text-wrap: pretty;
+  }
+}
+
+/* ==========================================================================
+   Motion — restrained by default, and fully disabled on request.
+   ========================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -220;
+  }
+}
+
+.animate-rise {
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-breathe {
+  animation: breathe 7s ease-in-out infinite;
+}
+.animate-twinkle {
+  animation: twinkle 4.5s ease-in-out infinite;
+}
+.animate-flow {
+  animation: flow-dash 9s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
