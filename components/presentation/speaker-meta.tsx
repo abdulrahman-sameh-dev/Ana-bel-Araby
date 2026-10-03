@@ -1,23 +1,36 @@
 "use client";
 
-import { motion } from "motion/react";
 import { Mic, CalendarDays, UserCog } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatClock } from "@/lib/format";
 import { presentation } from "@/data/presentation";
 
 /**
  * Footer rail shared by all four speaker sections.
  *
- * Layout is fixed by the brief: speaker on the **right** (the start of an RTL
- * line), date on the **left**. The duration chip sits in the middle and mirrors
- * the live clock, so the presenter can feel the 90 seconds without looking away
- * from the audience for long.
+ * Two things are on it, and both are for the room: who is speaking, and the
+ * date. Speaker on the **right** (the start of an RTL line), date on the left.
  *
- * The cover switch lives here too, next to the name it replaces. A presenter
- * taking over mid-talk should not have to find a switch somewhere else on the
- * slide, and a name shown in the footer with no way to change it is a name
- * that can be wrong.
+ * ## The duration chip that used to be here
+ *
+ * This footer carried «مدة القسم» and a live countdown beside it — allotted on
+ * the right, elapsed on the left, turning red past the allotment — plus a
+ * «تفعيل الاحتياطي» switch with its own label. All of it is on the projected
+ * screen, and all of it is information about the running of the event rather
+ * than about Arabic, which puts it squarely under the brief's rule that the
+ * audience's screen carries no timing and no presenter material. The live clock
+ * was the worst of it: a red number ticking past 90 in the footer of a talk
+ * about language, projected at people who were not asked to pace anything.
+ *
+ * It was here because the presenter needs it, and that is a real need — so the
+ * timing did not disappear, it moved. The shell's rail shows a live clock only
+ * while the presenter-notes overlay is open, `/presenter` carries each section's
+ * budget on the handout, and the presenter page is the surface they are already
+ * reading before they walk on.
+ *
+ * The backup switch keeps its target — a name on screen with no way to correct
+ * it is a name that can be wrong — and loses its caption, for the same reason
+ * the cards did: the icon carries the affordance and the `aria-label` and
+ * `title` carry the name.
  */
 export function SpeakerMeta({
   speaker,
@@ -25,8 +38,6 @@ export function SpeakerMeta({
   backupSpeaker,
   backupActive = false,
   onToggleBackup,
-  durationSeconds,
-  elapsed,
   tone = "ink",
   className,
 }: {
@@ -39,16 +50,10 @@ export function SpeakerMeta({
   /** True while the cover is holding the floor. */
   backupActive?: boolean;
   onToggleBackup?: () => void;
-  durationSeconds: number;
-  /** Live elapsed seconds for the current section. */
-  elapsed?: number;
   tone?: "ink" | "night";
   className?: string;
 }) {
   const isNight = tone === "night";
-  const allotted = formatClock(durationSeconds);
-  const live = elapsed === undefined ? null : formatClock(elapsed);
-  const overrun = elapsed !== undefined && elapsed > durationSeconds;
   /**
    * A section with no distinct cover has nothing to switch to, so the control
    * is not rendered at all. The test is against the *primary*, never against
@@ -64,9 +69,12 @@ export function SpeakerMeta({
   const strong = isNight ? "text-night-text" : "text-ink";
 
   return (
+    // Two groups now instead of three, so this fits comfortably where the
+    // timer used to sit. It still wraps rather than crushing the name: on a
+    // phone the speaker matters more than the date.
     <footer
       className={cn(
-        "flex items-center justify-between gap-4 border-t pt-3",
+        "flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t pt-3",
         isNight ? "border-night-line/70" : "border-paper-line",
         subtle,
         className,
@@ -99,6 +107,11 @@ export function SpeakerMeta({
             type="button"
             onClick={onToggleBackup}
             aria-pressed={backupActive}
+            aria-label={
+              backupActive
+                ? `العودة إلى ${primarySpeaker}`
+                : `تسليم التقديم إلى ${backupSpeaker}`
+            }
             title={
               backupActive
                 ? `العودة إلى ${primarySpeaker}`
@@ -116,44 +129,13 @@ export function SpeakerMeta({
             )}
           >
             <UserCog className="size-3 shrink-0" aria-hidden />
-            <span>{backupActive ? "الأساسي" : "تفعيل الاحتياطي"}</span>
+            {/* `aria-pressed` is the state and `aria-label` is the name, so the
+                wall shows one icon and nothing else. */}
+            <span className="sr-only">
+              {backupActive ? "الأساسي" : "تفعيل الاحتياطي"}
+            </span>
           </button>
         ) : null}
-      </div>
-
-      {/* Duration — allotted vs. live. */}
-      <div className="flex shrink-0 items-center gap-2.5">
-        <span className="hidden text-[0.7rem] tracking-wide sm:inline">
-          مدة القسم:
-        </span>
-        <span
-          className={cn(
-            "tabular flex items-baseline gap-1.5 rounded-full border px-2.5 py-1",
-            isNight
-              ? "border-gold-300/25 bg-night-raised"
-              : "border-gold-400/30 bg-gold-100/50",
-          )}
-        >
-          <span className={cn("text-[0.82rem] font-bold", strong)} dir="ltr">
-            {allotted}
-          </span>
-          {live !== null ? (
-            <>
-              <span aria-hidden className="text-[0.7rem] opacity-50">
-                ←
-              </span>
-              <span
-                className={cn(
-                  "tabular text-[0.82rem] font-bold",
-                  overrun ? "text-destructive" : "text-gold-500",
-                )}
-                dir="ltr"
-              >
-                {live}
-              </span>
-            </>
-          ) : null}
-        </span>
       </div>
 
       {/* End of the RTL line = left-hand side. */}

@@ -73,7 +73,21 @@ export function PresentationControls({
             <Button
               variant="ghost"
               size="icon"
-              className={controlClass}
+              /* Hidden below `sm`, like the shortcut sheet below.
+                 This is the one control a phone does not need: its whole
+                 affordance is the `F` key, which a touch device does not have,
+                 and the browser chrome already means the deck is not filling the
+                 phone's screen anyway.
+
+                 It is hidden rather than shrunk because the top rail genuinely
+                 runs out of room at 360px — the brand lockup is a fixed 8.5rem
+                 slot by design (so the rotating tagline cannot move the
+                 toolbar), and 8.5rem plus the movement pair plus the chapter
+                 numeral is already the whole width. Thirty-two pixels had to
+                 come from somewhere, and a control that cannot be used on the
+                 device is the honest place to take them. Everything from `sm`
+                 up keeps it. */
+              className={cn(controlClass, "hidden sm:inline-flex")}
               onClick={onToggleFullscreen}
               aria-pressed={isFullscreen}
               aria-label={isFullscreen ? "الخروج من ملء الشاشة" : "ملء الشاشة"}

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatClock } from "@/lib/format";
+import { usePrefersReducedMotion } from "@/hooks/use-presentation";
 
 /**
  * Section clock with pause / resume / reset.
@@ -35,6 +36,7 @@ export function SectionTimer({
   const ratio = Math.min(1, elapsed / durationSeconds);
   const shown = overrun ? formatClock(elapsed) : formatClock(remaining);
 
+  const reduced = usePrefersReducedMotion();
   const isNight = tone === "night";
   const R = 15;
   const CIRC = 2 * Math.PI * R;
@@ -139,9 +141,9 @@ export function SectionTimer({
       <AnimatePresence>
         {overrun ? (
           <motion.span
-            initial={{ opacity: 0, x: 6 }}
+            initial={reduced ? false : { opacity: 0, x: 6 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 6 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, x: 6 }}
             className="hidden type-micro font-semibold text-destructive sm:inline"
           >
             تجاوزت المدة

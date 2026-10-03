@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
-import { CalendarClock, ClipboardCheck, Maximize2 } from "lucide-react";
+import { ClipboardCheck, Maximize2, MessageCircleQuestion } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toArabicDigits } from "@/lib/format";
 import { behindTask, evidencePairs, presentation } from "@/data/presentation";
@@ -63,7 +63,7 @@ export function BehindSection() {
         <SectionHeader kicker={behindTask.kicker} title={behindTask.title} />
 
         {/* ---- the pair, dominant, beside the assignment ---- */}
-        <div className="mt-[var(--sp-block)] grid min-h-0 flex-1 grid-cols-1 gap-x-[clamp(1.25rem,0.75rem+2.5vw,3.5rem)] gap-y-[var(--sp-block)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+        <div className="mt-(--sp-block) grid min-h-0 flex-1 grid-cols-1 gap-x-[clamp(1.25rem,0.75rem+2.5vw,3.5rem)] gap-y-(--sp-block) lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           {/* Right, in RTL: the captures. */}
           <motion.figure
             key={pair.id}
@@ -93,7 +93,7 @@ export function BehindSection() {
                   />
                   <span
                     className={cn(
-                      "kicker absolute top-1.5 end-1.5 rounded-full border bg-paper/85 px-2 py-0.5 backdrop-blur-[1px]",
+                      "kicker absolute top-1.5 inset-e-1.5 rounded-full border bg-paper/85 px-2 py-0.5 backdrop-blur-[1px]",
                       role === "بعد"
                         ? "border-gold-400/60 text-gold-700"
                         : "border-paper-line text-ink-muted",
@@ -123,11 +123,11 @@ export function BehindSection() {
 
           {/* Left, in RTL: what the task was, and how to move through it. */}
           <div className="flex min-h-0 min-w-0 flex-col">
-            <p className="type-body type-body-lg font-semibold leading-[1.5] text-ink">
+            <p className="type-body type-body-lg font-semibold leading-normal text-ink">
               {behindTask.lead}
             </p>
 
-            <p className="mt-[var(--sp-block)] flex items-start gap-2.5 rounded-lg border border-gold-400/35 bg-gold-100/45 px-3.5 py-[clamp(0.45rem,0.3rem+0.6vh,0.8rem)]">
+            <p className="mt-(--sp-block) flex items-start gap-2.5 rounded-lg border border-gold-400/35 bg-gold-100/45 px-3.5 py-[clamp(0.45rem,0.3rem+0.6vh,0.8rem)]">
               <ClipboardCheck
                 className="mt-0.5 size-4 shrink-0 text-gold-600"
                 aria-hidden
@@ -137,34 +137,43 @@ export function BehindSection() {
               </span>
             </p>
 
-            <p className="mt-[var(--sp-block)] type-body-sm leading-[1.6] text-ink-muted">
+            <p className="mt-(--sp-block) type-body-sm leading-[1.6] text-ink-muted">
               {behindTask.evidenceNote}
             </p>
 
-            {/* Deadline, on the left column where there is room for it. */}
-            <div className="mt-[var(--sp-block)] flex items-center gap-2.5">
-              <span className="grid size-9 shrink-0 place-items-center rounded-full border border-gold-400/40 bg-gold-100/70">
-                <CalendarClock className="size-4 text-gold-600" aria-hidden />
-              </span>
-              <span className="min-w-0">
-                <span className="kicker block text-ink-faint">
-                  {behindTask.deadlineLabel}
-                </span>
-                <span className="block type-body font-bold text-ink">
-                  {behindTask.deadline}
-                </span>
-              </span>
-            </div>
+            {/* The purpose, where the deadline used to be.
 
-            <FiligreeRule className="mt-auto w-full pt-[var(--sp-block)]" />
+                This is the stage's argument rather than its logistics, so it is
+                set as a question in the display face and given the emphasis the
+                date used to get. The screenshots to its side are the evidence
+                for it; nothing else on this stage competes with it. */}
+            <p className="mt-(--sp-block) flex items-start gap-2.5 type-display-sm balance leading-[1.45] text-ink">
+              <MessageCircleQuestion
+                className="mt-1 size-4 shrink-0 text-gold-600"
+                aria-hidden
+              />
+              {behindTask.purpose}
+            </p>
+
+            <FiligreeRule className="mt-auto w-full pt-(--sp-block)" />
           </div>
         </div>
 
-        {/* ---- the other eight, as a rail ---- */}
-        <nav aria-label="بقية الحالات" className="mt-[var(--sp-block)] shrink-0">
-          <ol data-keynav className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        {/* ---- the other eight, as a rail of thumbnails ----
+            This used to be nine buttons showing nothing but a case number, so
+            the row read «١ ٢ ٣ …» and told the audience there were nine captures
+            without ever showing one of them. Each item now carries the actual
+            «بعد» capture as its thumbnail, so the gallery looks like the
+            evidence it is. The number stays as a plate over the top corner so
+            the presenter can still name a case out loud. */}
+        <nav aria-label="بقية الحالات" className="mt-(--sp-block) shrink-0">
+          <ol
+            data-keynav
+            className="flex flex-wrap items-center gap-1.5 sm:gap-2"
+          >
             {evidencePairs.map((p, i) => {
-              const state = i === current ? "active" : i < current ? "done" : "ahead";
+              const state =
+                i === current ? "active" : i < current ? "done" : "ahead";
               return (
                 <li key={p.id}>
                   <button
@@ -172,17 +181,39 @@ export function BehindSection() {
                     onClick={() => setCurrent(i)}
                     aria-current={state === "active" ? "true" : undefined}
                     aria-label={`الحالة ${p.index}`}
-                    className="group h-7 cursor-pointer p-0"
+                    className="group relative block size-[clamp(2.75rem,2.2rem+2vw,3.5rem)] cursor-pointer overflow-hidden rounded-md border bg-paper-sunk p-0 transition-[border-color,transform] duration-200 hover:scale-105"
                   >
+                    <Image
+                      src={p.after.src}
+                      alt=""
+                      fill
+                      sizes="56px"
+                      className={cn(
+                        // `object-top` is what makes the crop honest. Nine of
+                        // these captures are tall phone screenshots — 720×1600,
+                        // 922×2048 — so a default centre crop lands on the
+                        // middle of someone's feed, where there is no name to
+                        // compare. Anchored to the top it shows the profile
+                        // header, which is the only part of the capture that
+                        // distinguishes one case from another. `object-cover`
+                        // then fills the square without distorting the shot.
+                        "object-cover object-top transition-opacity duration-200",
+                        state === "active"
+                          ? "opacity-100"
+                          : state === "done"
+                            ? "opacity-80"
+                            : "opacity-55 group-hover:opacity-90",
+                      )}
+                      loading="lazy"
+                    />
                     <span
                       className={cn(
-                        "tabular grid h-7 min-w-7 place-items-center rounded-md border px-1.5 type-micro font-semibold transition-colors duration-200",
+                        "tabular absolute top-0.5 inset-e-0.5 rounded-sm border px-1 font-semibold leading-[1.35] backdrop-blur-[2px]",
                         state === "active"
-                          ? "border-gold-500/60 bg-gold-400/25 text-ink"
-                          : state === "done"
-                            ? "border-gold-400/35 bg-gold-100/60 text-ink-soft"
-                            : "border-paper-line bg-paper-raised/60 text-ink-faint",
+                          ? "border-gold-500/60 bg-paper/90 text-ink"
+                          : "border-paper-line bg-paper/75 text-ink-muted",
                       )}
+                      style={{ fontSize: "clamp(0.5rem,0.44rem+0.2vw,0.6rem)" }}
                     >
                       {p.index}
                     </span>
@@ -193,7 +224,7 @@ export function BehindSection() {
           </ol>
         </nav>
 
-        <footer className="mt-[var(--sp-block)] flex shrink-0 items-center justify-between gap-4 border-t border-paper-line pt-2.5 type-body-sm text-ink-muted">
+        <footer className="mt-(--sp-block) flex shrink-0 items-center justify-between gap-4 border-t border-paper-line pt-2.5 type-body-sm text-ink-muted">
           <span className="font-semibold text-ink">{presentation.team}</span>
           <span>
             <span className="sr-only">{presentation.dateLabel}: </span>

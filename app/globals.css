@@ -271,6 +271,11 @@
   --sp-tight: clamp(0.4rem, 0.25rem + 0.5vh, 0.75rem);
 
   --numeral-size: clamp(2.1rem, 1.6rem + 1.9vw, 3.3rem);
+
+  /* The chapter numeral when it is a contextual marker inside the content
+     block rather than a masthead — smaller, because the point title is meant to
+     be the largest type on the stage and the chapter only has to be findable. */
+  --numeral-size-context: clamp(1.1rem, 0.9rem + 0.7vw, 1.6rem);
 }
 
 /* Short viewports: step the whole deck down a notch. The `vh` terms are kept
@@ -278,6 +283,7 @@
    though both are capped by the same media query. */
 @media (max-height: 880px) {
   :root {
+    --numeral-size-context: clamp(1rem, 0.85rem + 0.5vw, 1.35rem);
     --fs-display-xl: clamp(2rem, 1.2rem + 2.7vw + 0.4vh, 3.7rem);
     --fs-display-lg: clamp(1.5rem, 1rem + 1.7vw + 0.28vh, 2.8rem);
     --fs-display-md: clamp(1.15rem, 0.9rem + 0.88vw + 0.16vh, 1.82rem);
@@ -289,6 +295,7 @@
     --fs-scripture: clamp(1rem, 0.85rem + 0.5vw + 0.15vh, 1.5rem);
     --lh-scripture: 1.95;
     --numeral-size: clamp(1.8rem, 1.4rem + 1.3vw + 0.2vh, 2.8rem);
+    --numeral-size-context: clamp(0.95rem, 0.85rem + 0.4vw + 0.1vh, 1.25rem);
   }
 }
 
@@ -311,6 +318,7 @@
     --fs-scripture: clamp(0.95rem, 0.84rem + 0.44vw + 0.12vh, 1.32rem);
     --lh-scripture: 1.85;
     --numeral-size: clamp(1.6rem, 1.3rem + 1.05vw + 0.16vh, 2.3rem);
+    --numeral-size-context: clamp(0.85rem, 0.78rem + 0.3vw + 0.06vh, 1.1rem);
   }
 }
 

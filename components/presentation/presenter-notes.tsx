@@ -1,20 +1,29 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { X, Target, Timer, ListOrdered } from "lucide-react";
+import { X, Target, Timer, ListOrdered, MoveLeft } from "lucide-react";
 import type { NotesSource } from "@/data/presentation";
-import { formatClock } from "@/lib/format";
+import type { PresentationPoint } from "@/data/points";
+import { formatClock, toArabicDigits } from "@/lib/format";
+import { usePrefersReducedMotion } from "@/hooks/use-presentation";
 
 /**
  * Presenter notes — hidden until the presenter presses `N`.
  *
- * Cues only, never a script: the goal is to jog memory in the two seconds
- * between sections, not to be read aloud. The panel docks to the side on wide
- * screens and becomes a bottom sheet on narrow ones, so it never covers the
- * part of the stage the audience is looking at.
+ * When a point is on stage the panel describes *that point*: its cues, roughly
+ * how long it should run, and the line that carries into the next one. A
+ * presenter two seconds from speaking needs to know what to say now, not what
+ * the chapter was about, so the chapter's own notes fold underneath.
+ *
+ * Cues, never a script: the goal is to jog memory, not to be read aloud. The
+ * panel docks to the side on wide screens and becomes a bottom sheet on narrow
+ * ones, so it never covers the part of the stage the audience is looking at.
  */
 export function PresenterNotes({
   section,
+  point,
+  pointIndex,
+  pointCount,
   open,
   onClose,
   elapsed,
@@ -22,13 +31,20 @@ export function PresenterNotes({
   className,
 }: {
   section: NotesSource | null;
+  /** The point on stage; `null` on stages that are not made of points. */
+  point?: PresentationPoint | null;
+  pointIndex?: number;
+  pointCount?: number;
   open: boolean;
   onClose: () => void;
   elapsed: number;
-  /** Resolved live, so a cover presenter sees their own name here too. */
+  /** Resolved live, so a backup presenter sees their own name here too. */
   speaker?: string;
   className?: string;
 }) {
+  const reduced = usePrefersReducedMotion();
+  const last = point !== null && point !== undefined && pointIndex === pointCount! - 1;
+
   return (
     <AnimatePresence>
       {open && section ? (
@@ -36,10 +52,10 @@ export function PresenterNotes({
           key="notes"
           role="complementary"
           aria-label="لوحة ملاحظات المتحدث"
-          initial={{ opacity: 0, x: -24 }}
+          initial={reduced ? false : { opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -24 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          exit={reduced ? { opacity: 0 } : { opacity: 0, x: -24 }}
+          transition={{ duration: reduced ? 0.001 : 0.28, ease: [0.22, 1, 0.36, 1] }}
           className={className}
         >
           <div className="flex items-start justify-between gap-3 border-b border-night-line pb-3">
@@ -49,6 +65,12 @@ export function PresenterNotes({
                 {section.numeral ? `${section.numeral} · ` : ""}
                 {section.shortTitle}
               </h3>
+              {point ? (
+                <p className="tabular mt-0.5 truncate text-[0.7rem] text-gold-300">
+                  النقطة {point.index} من {toArabicDigits(pointCount ?? 1)}:{" "}
+                  {point.title}
+                </p>
+              ) : null}
             </div>
             <button
               type="button"
@@ -61,6 +83,60 @@ export function PresenterNotes({
           </div>
 
           <div className="mt-3 space-y-4">
+            {point ? (
+              <>
+                {/* What to say while this point is on screen. */}
+                <ul className="space-y-1.5">
+                  {point.presenterNotes.map((cue, i) => (
+                    <motion.li
+                      key={cue}
+                      initial={reduced ? false : { opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: reduced ? 0.001 : 0.25, delay: reduced ? 0 : 0.05 + i * 0.035 }}
+                      className="flex items-start gap-2 type-body-sm leading-relaxed text-night-text"
+                    >
+                      <span
+                        className="tabular mt-0.5 shrink-0 font-bold text-gold-300/70"
+                        dir="ltr"
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span>{cue}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                <div className="flex items-center gap-2 text-night-muted">
+                  <Timer className="size-3.5 shrink-0" aria-hidden />
+                  <span className="text-[0.7rem]">
+                    {point.durationSeconds === null ? (
+                      "هذه النقطة بلا وقت محدد"
+                    ) : (
+                      <>
+                        هذه النقطة: نحو {toArabicDigits(point.durationSeconds)} ثانية
+                      </>
+                    )}
+                  </span>
+                </div>
+
+                {/* The bridge, quoted so it can be said verbatim. */}
+                <div className="flex items-start gap-2.5 rounded-lg border border-night-line bg-night-raised/60 p-3">
+                  <MoveLeft
+                    className="mt-0.5 size-3.5 shrink-0 text-gold-300"
+                    aria-hidden
+                  />
+                  <div className="min-w-0">
+                    <p className="text-[0.7rem] font-semibold text-gold-300">
+                      {last ? "بعد هذه النقطة" : "الانتقال"}
+                    </p>
+                    <p className="mt-0.5 type-body-sm leading-relaxed text-night-text">
+                      {point.transition}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : null}
+
             <div className="flex items-start gap-2.5 rounded-lg border border-gold-300/20 bg-gold-300/8 p-3">
               <Target
                 className="mt-0.5 size-3.5 shrink-0 text-gold-300"
@@ -85,9 +161,9 @@ export function PresenterNotes({
                 {section.notes.cues.map((cue, i) => (
                   <motion.li
                     key={cue}
-                    initial={{ opacity: 0, y: 6 }}
+                    initial={reduced ? false : { opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: 0.05 + i * 0.035 }}
+                    transition={{ duration: reduced ? 0.001 : 0.25, delay: reduced ? 0 : 0.05 + i * 0.035 }}
                     className="flex items-start gap-2 type-body-sm leading-relaxed text-night-muted"
                   >
                     <span

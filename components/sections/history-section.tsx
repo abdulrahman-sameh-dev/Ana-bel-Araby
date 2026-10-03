@@ -1,313 +1,271 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Globe } from "lucide-react";
+import { motion } from "motion/react";
 
-import {
-  historyArtwork,
-  historyClosing,
-  influenceWords,
-  timelineEras,
-  type Section,
-} from "@/data/presentation";
-import { SectionHeader } from "@/components/presentation/section-header";
-import { NextPointPreview } from "@/components/presentation/next-point-preview";
-import { SpeakerMeta } from "@/components/presentation/speaker-meta";
 import { cn } from "@/lib/utils";
+import { timelineEras, historyClosing, type Section } from "@/data/presentation";
+import type { PresentationPoint } from "@/data/points";
+import { SectionHeader } from "@/components/presentation/section-header";
+import { SpeakerMeta } from "@/components/presentation/speaker-meta";
+import { ArabesqueField } from "@/components/presentation/ornaments";
+import { SpotlightStage } from "@/components/presentation/spotlight-stage";
+import { PointVisual } from "@/components/presentation/point-visual";
+import { SectionHandoff } from "@/components/sections/section-handoff";
+import { usePrefersReducedMotion } from "@/hooks/use-presentation";
 
 /**
- * Stage 04 — History & influence.
+ * Stage 04 — History.
  *
- * Metaphor: a single horizontal axis running right-to-left, the way the script
- * reads. Seven stops; the active one lifts off the line and explains itself
- * below. The influence words then leave the timeline entirely and travel out
- * to the right — the point being that Arabic stopped at the edge of the map.
+ * A timeline, walked one stop at a time. The rail beside the stage is the whole
+ * journey: the stop on stage is lit and carries its period, the stops either
+ * side of it stay dim, and the room can see how much road is left without being
+ * able to read what is at the end of it.
+ *
+ * ## Why the rail replaced the side image
+ *
+ * This stage used to hold one artwork in the side column for all seven points.
+ * That is the failure mode the brief calls out — the same idea picture repeated
+ * because the section had multiple points. It also spent the widest column on
+ * a static photograph while the thing that genuinely changes from point to
+ * point, *where we are in time*, had nowhere to go.
+ *
+ * So the rail is content, not decoration: seven stops, the current one named
+ * and dated by span, and no invented years — the source gives an order, not a
+ * calendar. The team's own artwork is no longer stretched across the stage; it
+ * stays on the closing slide where it can be looked at once.
  */
+/** The chapter's last stop — the four European loanwords.
+ *
+ *  Named once because the id is `influence`, not `europe`: `europe` is the
+ *  *era's* id, and a comparison against it matches nothing at all, which left
+ *  the final stop with neither its lead line nor its period. */
+const LAST_STOP = "influence";
+
 export function HistorySection({
   section,
   speaker,
   backupActive,
   onToggleBackup,
-  elapsed,
+  point,
+  pointIndex,
+  points,
+  onSelectPoint,
+  handoffVisible,
+  onDismissHandoff,
+  onAdvanceHandoff,
 }: {
   section: Section;
-  /** Already resolved by the shell: primary or cover. */
   speaker: string;
-  /** True while the backup presenter is holding the floor. */
   backupActive: boolean;
   onToggleBackup: () => void;
-  elapsed: number;
-  onNext: () => void;
-  onPrevious: () => void;
+  point: PresentationPoint;
+  pointIndex: number;
+  points: PresentationPoint[];
+  onSelectPoint: (index: number) => void;
+  handoffVisible: boolean;
+  onDismissHandoff: () => void;
+  onAdvanceHandoff: () => void;
 }) {
-  const [active, setActive] = useState(0);
-  const era = timelineEras[active];
-  const [word, setWord] = useState<string | null>(null);
+  const reduced = usePrefersReducedMotion();
+  const era = timelineEras.find((e) => e.id === point.id);
 
   return (
     <section
       className="grain stage-page relative flex min-h-0 flex-1 flex-col overflow-hidden"
       aria-label={section.title}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_20%_0%,var(--accent-olive-soft)_0%,transparent_70%)] opacity-70"
-      />
+      <ArabesqueField tone="ink" opacity={0.04} />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[min(100%,1680px)] min-h-0 flex-1 flex-col gap-[var(--sp-stage)]">
-        <SectionHeader
-          numeral={section.numeral}
-          kicker={section.kicker}
-          title={section.title}
-        />
-
-        {/* ---------------- the axis ---------------- */}
-        <div className="relative shrink-0 pt-1">
-          {/* the rule */}
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-[1.75rem] h-px bg-gradient-to-l from-transparent via-paper-line to-transparent"
+      <div className="relative z-10 mx-auto flex w-full max-w-[min(100%,1680px)] min-h-0 flex-1 flex-col gap-(--sp-stage)">
+        {handoffVisible ? (
+          <SectionHandoff
+            handoffFrom={section.id}
+            onContinue={onAdvanceHandoff}
+            onBack={onDismissHandoff}
           />
-          {/* the travelled part of the rule */}
-          <motion.div
-            aria-hidden
-            className="absolute top-[1.75rem] h-px bg-gold-400/70"
-            style={{ insetInlineStart: 0 }}
-            initial={{ width: 0 }}
-            animate={{
-              width: `${((active + 0.5) / timelineEras.length) * 100}%`,
-            }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          />
+        ) : (
+          <SpotlightStage
+            point={point}
+            points={points}
+            index={pointIndex}
+            onSelect={onSelectPoint}
+            /* The rail below is this chapter's own visual and its own era index,
+               mounted once in the persistent slot with the stop on stage lit.
+               The navigator underneath is the shared one — the same component,
+               the same markup and the same `onSelect` the other three chapters
+               use, not a history-specific one.
 
-          <ol
-            className="relative grid grid-cols-7 gap-0.5"
-            data-keynav
-            aria-label="مراحل تاريخ اللغة"
+               It used to be switched off here, on the grounds that a rail and a
+               tick row are two progress indicators for one sequence and only
+               one of them earns its place. That was a defensible call about
+               this chapter's composition, but it left the fourth chapter on a
+               different navigation mechanism from the first three, which is not
+               what consistency means: the audience should not have to learn a
+               second way of moving between points at the last chapter. The rail
+               stays — it names every era, which is what makes this stage this
+               stage — and the shared navigator is now on, exactly as in
+               chapters 01–03. */
+            visual={<HistoryRail activeId={point.id} onSelect={onSelectPoint} />}
+            visualWidth="15rem"
+            /* The rail is this stage's visual, and the point navigator below it
+               is the shared one. What makes this stage is the rail, not the
+               treatment. */
+            heading={
+              <SectionHeader
+                numeral={section.numeral}
+                kicker={section.kicker}
+                title={section.title}
+                hook={section.hook}
+              />
+            }
           >
-            {timelineEras.map((item, i) => {
-              const isActive = i === active;
-              const isPast = i < active;
-              return (
-                <li key={item.id} className="min-w-0">
-                  <button
-                    type="button"
-                    onClick={() => setActive(i)}
-                    aria-current={isActive ? "step" : undefined}
-                    className="group flex w-full cursor-pointer flex-col items-center gap-1 text-center"
-                  >
-                    <span
-                      className={cn(
-                        "tabular font-display type-micro font-bold transition-colors duration-300",
-                        isActive
-                          ? "text-accent-olive"
-                          : isPast
-                            ? "text-gold-500"
-                            : "text-ink-faint",
-                      )}
-                    >
-                      {item.index}
-                    </span>
+            {/* The journey. A vertical rail in RTL reading order, with the stop
+                on stage lit and the stops either side dimmed. It replaces a side
+                image that repeated on all seven points: the artwork says "this
+                is history" once, and the rail says where we *are*, which is the
+                thing that actually changes between one point and the next.
 
-                    {/* the node on the line */}
-                    <motion.span
-                      animate={{
-                        scale: isActive ? 1.25 : 1,
-                        backgroundColor: isActive
-                          ? "var(--accent-olive)"
-                          : isPast
-                            ? "var(--gold-400)"
-                            : "var(--paper-raised)",
-                      }}
-                      transition={{ duration: 0.25 }}
-                      className={cn(
-                        "relative z-10 block size-[clamp(0.5rem,0.45rem+0.2vh,0.75rem)] rounded-full border-2",
-                        isActive
-                          ? "border-accent-olive"
-                          : isPast
-                            ? "border-gold-400"
-                            : "border-paper-line",
-                      )}
-                    />
-
-                    <span
-                      className={cn(
-                        "type-body-sm leading-tight transition-colors duration-300",
-                        isActive
-                          ? "font-bold text-ink"
-                          : "text-ink-muted group-hover:text-ink-soft",
-                      )}
-                    >
-                      {item.title}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-
-        {/* ---------------- what the active stop means ---------------- */}
-        <div className="grid min-h-0 flex-1 gap-[var(--sp-block)] lg:grid-cols-[1fr_19rem]">
-          <div className="flex min-h-0 flex-col gap-[var(--sp-block)]">
-            <motion.div
-              key={era.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.32 }}
-              className="ornament-frame relative shrink-0 rounded-lg bg-paper-raised px-[clamp(0.9rem,0.65rem+0.7vw,1.4rem)] py-[var(--sp-block)]"
-            >
-              <div className="flex items-center gap-2.5">
-                <span className="tabular font-display type-display-md leading-none font-bold text-gold-400/50">
-                  {era.index}
+                Because it sits in the persistent slot it is mounted once for the
+                chapter. It still re-renders per point — it has to, to move the
+                highlight — but it does not unmount, so its entrance and its
+                highlight transitions play on a component that has been there
+                since the section opened. */}
+            <div className="flex min-h-0 flex-col gap-(--sp-tight)">
+              <p className="flex items-center gap-2.5">
+                <span className="tabular grid size-8 shrink-0 place-items-center rounded-full border border-gold-400/60 bg-paper-raised font-display type-body-sm font-bold text-gold-600">
+                  {point.index}
                 </span>
-                <div className="min-w-0">
-                  <h3 className="stage-title type-body-lg text-ink">{era.title}</h3>
-                  <p className="type-body-sm font-semibold text-accent-olive">
-                    {era.period}
-                  </p>
-                </div>
-              </div>
-              <p className="mt-1.5 type-body leading-relaxed text-ink-soft">
-                {era.detail}
+                {era ? (
+                  <span className="kicker text-gold-600">{era.period}</span>
+                ) : (
+                  <span className="kicker text-gold-600">أمثلة على التأثير</span>
+                )}
               </p>
-            </motion.div>
 
-            {/* Arabic → Knowledge → World */}
-            <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-paper-line bg-paper-raised/60 p-[clamp(0.7rem,0.55rem+0.4vw,1rem)]">
-              <p className="kicker text-ink-faint">أثر العربية</p>
+              <h2 className="stage-title type-display-md balance text-ink">
+                {point.title}
+              </h2>
 
-              <div className="mt-[var(--sp-tight)] flex items-center gap-2 text-center">
-                <FlowPill label="العربية" tone="ink" />
-                <ArrowLeft className="size-3.5 shrink-0 text-gold-400" aria-hidden />
-                <FlowPill label="المعرفة" tone="olive" />
-                <ArrowLeft className="size-3.5 shrink-0 text-gold-400" aria-hidden />
-                <FlowPill label="العالم" tone="gold" />
-              </div>
-
-              <ul className="mt-[var(--sp-block)] grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                {influenceWords.map((w) => {
-                  const isOpen = word === w.word;
-                  return (
-                    <li key={w.word}>
-                      <button
-                        type="button"
-                        onClick={() => setWord(isOpen ? null : w.word)}
-                        aria-expanded={isOpen}
-                        className={cn(
-                          "flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-md border px-2.5 py-[clamp(0.3rem,0.22rem+0.3vh,0.6rem)] text-start transition-all duration-250",
-                          isOpen
-                            ? "border-gold-400/60 bg-gold-100/70"
-                            : "border-paper-line bg-paper hover:border-gold-300/60 hover:bg-gold-100/40",
-                        )}
-                      >
-                        <span className="tabular font-display type-micro font-bold text-gold-500">
-                          {w.index}
-                        </span>
-                        <span
-                          className="font-latin type-body-lg font-semibold text-ink"
-                          dir="ltr"
-                        >
-                          {w.word}
-                        </span>
-                        <AnimatePresence initial={false}>
-                          {isOpen ? (
-                            <motion.span
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25 }}
-                              className="block w-full overflow-hidden"
-                            >
-                              <span className="mt-1 block border-t border-dashed border-gold-300/60 pt-1 type-micro leading-relaxed text-ink-soft">
-                                كلمة انتقلت إلى اللغات الأوروبية
-                              </span>
-                            </motion.span>
-                          ) : null}
-                        </AnimatePresence>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <p className="mt-auto pt-[var(--sp-tight)] type-body-sm leading-relaxed text-ink-soft balance">
-                {historyClosing.lead}{" "}
-                <span className="font-semibold text-ink">{historyClosing.tail}</span>
-              </p>
+              {/* ── on the final stop the four loanwords *are* the content, so
+                  they take the whole stage and no headline repeats them. On
+                  every other stop the period is a one-word typographic object
+                  and the detail below carries the idea. ── */}
+              {point.id === LAST_STOP ? (
+                <>
+                  <PointVisual visual={point.visual} tone="ink" />
+                  <motion.p
+                    key={`${point.id}-lead`}
+                    initial={reduced ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.06 }}
+                    className="type-body-lg balance text-ink-soft"
+                  >
+                    {historyClosing.lead}
+                  </motion.p>
+                </>
+              ) : (
+                <>
+                  <PointVisual visual={point.visual} tone="ink" />
+                  <motion.p
+                    key={`${point.id}-detail`}
+                    initial={reduced ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.06 }}
+                    className="type-body-lg balance text-ink-soft"
+                  >
+                    {era?.detail}
+                  </motion.p>
+                </>
+              )}
             </div>
-          </div>
-
-          {/* the team's history artwork, kept in the corner as evidence */}
-          <figure className="relative hidden overflow-hidden rounded-lg border border-paper-line bg-paper-sunk lg:block">
-            <Image
-              src={historyArtwork.src}
-              alt={historyArtwork.alt}
-              fill
-              sizes="20rem"
-              className="object-cover"
-              loading="lazy"
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-paper/85 via-paper/15 to-transparent"
-            />
-            <figcaption className="absolute inset-x-3 bottom-2 flex items-center gap-1.5 type-micro text-ink-muted">
-              <Globe className="size-3" aria-hidden />
-              {historyArtwork.caption}
-            </figcaption>
-          </figure>
-        </div>
+          </SpotlightStage>
+        )}
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-[min(100%,1680px)] pt-[var(--sp-tight)]">
-        {/* Where the axis has got to, and the era about to open. */}
-        <div className="mb-[var(--sp-tight)] flex justify-end">
-          <NextPointPreview
-            total={timelineEras.length}
-            current={active}
-            currentLabel={era.title}
-            nextLabel={timelineEras[active + 1]?.title ?? null}
-          />
-        </div>
-
+      <div className="relative z-10 mx-auto w-full max-w-[min(100%,1680px)] pt-(--sp-tight)">
         <SpeakerMeta
           speaker={speaker}
           primarySpeaker={section.speaker}
           backupSpeaker={section.speakerBackup}
           backupActive={backupActive}
           onToggleBackup={onToggleBackup}
-          durationSeconds={section.durationSeconds}
-          elapsed={elapsed}
         />
       </div>
     </section>
   );
 }
 
-function FlowPill({
-  label,
-  tone,
+/**
+ * The chapter's chronology: every stop named, with the one on stage lit.
+ *
+ * Extracted so it can live in `SpotlightStage`'s persistent slot. It re-renders
+ * whenever `activeId` changes — that is how the highlight moves — but it does not
+ * remount, so the entrance below plays once when the section opens rather than
+ * once per point. Its entrance is a short slide because the rail is arriving as
+ * a *new object* in the composition; the highlight itself is a colour and scale
+ * change on an element that never moved, which needs no entrance at all.
+ *
+ * Not a picture of a place: the stops are the content.
+ */
+function HistoryRail({
+  activeId,
+  onSelect,
 }: {
-  label: string;
-  tone: "ink" | "olive" | "gold";
+  activeId: string;
+  onSelect: (index: number) => void;
 }) {
-  const tones = {
-    ink: "border-ink/20 bg-ink text-paper",
-    olive: "border-accent-olive/30 bg-accent-olive/10 text-accent-olive",
-    gold: "border-gold-400/40 bg-gold-100/70 text-gold-600",
-  } as const;
-
+  const reduced = usePrefersReducedMotion();
   return (
-    <span
-      className={cn(
-        "flex-1 rounded-md border px-2 py-1 text-center type-body-sm font-bold",
-        tones[tone],
-      )}
+    <motion.ol
+      initial={reduced ? false : { opacity: 0, x: 12 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: reduced ? 0.001 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+      aria-label="محطات التاريخ"
+      className="flex h-full min-h-0 flex-col justify-center gap-0"
     >
-      {label}
-    </span>
+      {timelineEras.map((e, i) => {
+        const active = e.id === activeId;
+        return (
+          <li key={e.id} className="relative flex items-stretch gap-2.5">
+            {/* The node, and the connector down to the next stop. */}
+            <span aria-hidden className="relative flex w-3 shrink-0 flex-col items-center">
+              <span
+                className={cn(
+                  "mt-1 block size-2.5 shrink-0 rounded-full transition-all duration-300",
+                  active ? "scale-125 bg-gold-500" : "bg-paper-line",
+                )}
+              />
+              {i !== timelineEras.length - 1 ? (
+                <span
+                  className={cn(
+                    "w-px flex-1 transition-colors duration-300",
+                    active ? "bg-gold-400/60" : "bg-paper-line",
+                  )}
+                />
+              ) : null}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => onSelect(i)}
+              aria-current={active ? "step" : undefined}
+              className="flex min-w-0 cursor-pointer flex-col items-start pb-2 text-start"
+            >
+              <span
+                className={cn(
+                  "font-display text-[clamp(0.8rem,0.74rem+0.3vw,1.05rem)] leading-tight transition-colors duration-300",
+                  active ? "text-ink" : "text-ink-faint/70 hover:text-ink-muted",
+                )}
+              >
+                {e.title}
+              </span>
+              {active ? (
+                <span className="kicker mt-0.5 text-gold-600">{e.period}</span>
+              ) : null}
+            </button>
+          </li>
+        );
+      })}
+    </motion.ol>
   );
 }

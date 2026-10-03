@@ -21,7 +21,10 @@ export function PresentationProgress({
   tone = "ink",
   className,
 }: {
-  /** -1 on the cover, 0–3 across the sections, 4 on the closing. */
+  /**
+   * -1 on every stage that is not one of the chapters — the cover, the opening
+   * question and the three stages after the last one — 0–3 across the chapters.
+   */
   activeIndex: number;
   onSelect: (index: number) => void;
   /** Matches the stage underneath, so the rail never inverts against it. */
@@ -49,7 +52,14 @@ export function PresentationProgress({
         <span className="tabular">{toArabicDigits(sections.length)}</span>
       </span>
 
-      <ol className="flex items-center gap-1.5 sm:gap-2">
+      {/* The bar list is hidden below `sm`. It is ~136px of chrome, and at
+          390px it did not fit beside the brand slot, the numeral, and the
+          movement and utility controls — the row spilled 130px sideways and gave
+          the whole stage a horizontal scroll. The numeral above already says
+          where we are ("٠٢ / ٠٤"), and it is a tenth of the width, so on a phone
+          the bars were paying for information the numeral was already giving.
+          Everything from `sm` up keeps them. */}
+      <ol className="hidden items-center gap-1.5 sm:flex sm:gap-2">
         {sections.map((section, i) => {
           const state =
             i < activeIndex ? "done" : i === activeIndex ? "active" : "ahead";

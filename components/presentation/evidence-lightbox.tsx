@@ -7,6 +7,7 @@ import { X, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toArabicDigits } from "@/lib/format";
 import type { EvidencePair } from "@/data/presentation";
+import { usePrefersReducedMotion } from "@/hooks/use-presentation";
 
 /**
  * Full-height view of one before/after pair.
@@ -33,6 +34,7 @@ export function EvidenceLightbox({
   onStep: (delta: number) => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const reduced = usePrefersReducedMotion();
 
   // Move focus into the dialog so the next Tab lands on the close button
   // rather than back up in the grid underneath.
@@ -66,7 +68,11 @@ export function EvidenceLightbox({
   return (
     <div
       data-modal
-      className="fixed inset-0 z-50 grid place-items-center bg-ink/80 p-4 backdrop-blur-[3px] sm:p-6"
+      // `grid-rows-[minmax(0,1fr)]` gives the single child a definite row to
+      // fill. A bare `grid` sizes its implicit row to content, which is zero
+      // for absolutely-positioned images, so the dialog would have nothing to
+      // lay the screenshots out in.
+      className="fixed inset-0 z-50 grid grid-rows-[minmax(0,1fr)] place-items-center bg-ink/80 p-4 backdrop-blur-[3px] sm:p-6"
       onClick={onClose}
       role="presentation"
     >
@@ -75,11 +81,17 @@ export function EvidenceLightbox({
         role="dialog"
         aria-modal="true"
         aria-label={`الحالة ${pair.index} — لقطة قبل وبعد تغيير الاسم`}
-        initial={{ opacity: 0, scale: 0.97 }}
+        initial={reduced ? false : { opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: reduced ? 0.001 : 0.2, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-full w-full max-w-4xl flex-col gap-3"
+        // `h-full` is load-bearing, not decoration. The images below are
+        // `next/image` with `fill`, so they are taken out of flow and
+        // contribute no height of their own. Without a definite height here
+        // the flex column would size to that zero, the `grow` wrapper would
+        // resolve to 0, and the dialog would open showing only the counter and
+        // the "قبل / بعد" captions with the screenshots invisible.
+        className="flex h-full max-h-full w-full max-w-4xl flex-col gap-3"
       >
         {/* Bar: which case, and the way out. */}
         <div className="flex items-center justify-between gap-3">
@@ -120,7 +132,7 @@ export function EvidenceLightbox({
         </div>
 
         {/* The pair, uncropped, at reading size. */}
-        <div className="grid min-h-0 grow grid-cols-2 gap-2 sm:gap-3">
+        <div className="grid min-h-0 grow grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
           {shots.map(({ role, shot, dim }) => (
             <figure key={role} className="flex min-h-0 flex-col gap-1.5">
               <figcaption
@@ -141,7 +153,7 @@ export function EvidenceLightbox({
                   src={shot.src}
                   alt={shot.alt}
                   fill
-                  sizes="(max-width: 640px) 48vw, 30vw"
+                  sizes="(max-width: 640px) 92vw, 30vw"
                   className="object-contain"
                   priority
                 />

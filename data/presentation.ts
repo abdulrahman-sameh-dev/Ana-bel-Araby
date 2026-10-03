@@ -5,33 +5,54 @@
  * (برزينتشن-انا-بالعربي-فريق-3-2.pptx.pdf and هانداوت-أنا-بالعربي-فريق-٣.docx.pdf).
  * Nothing here may be edited without checking the source — see the note at the
  * bottom of this file.
+ *
+ * ## Audience copy vs presenter copy
+ *
+ * This module holds both, and the split is deliberate. `cover`, `sections`,
+ * `timelineEras` and `closing` are what the room reads. Everything reached
+ * through a `notes` field, plus `openingChallenge.answerNote` and the `line` /
+ * `cue` fields of every hand-off, is what the *speaker* reads and lives only on
+ * `/presenter`. A staging direction — «اقرأ بهدوء», «لا تضف تواريخ», «كما وردت
+ * في المادة» — has no place on a projector: the audience is being told how to
+ * present rather than given something to think about.
  */
+
+import { toArabicDigits } from "@/lib/format";
 
 /* -------------------------------------------------------------------------- */
 /*  Presentation-level configuration                                          */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Date shown in the footer of every section.
+ * Date shown in the footer of every stage, and on the presenter handout.
  *
- * No presentation date was supplied with the source material, so this is left
- * as a visible placeholder rather than an invented date. Replace the string
- * with e.g. `"١٤٤٧ هـ"` or `"2026-09-26"` and it updates everywhere at once.
+ * Supplied by the team and written out in full, in Arabic-Indic digits inside
+ * Arabic text. This is the *presentation date*, not a submission deadline — the
+ * two were once the same string here, which is why the distinction is written
+ * down. Changing it here changes it on every stage and in the handout at once.
  */
-export const PRESENTATION_DATE = "—  —  —";
+export const PRESENTATION_DATE = "الجمعة ٩ أكتوبر ٢٠٢٦";
 
 /** Shown next to the date. */
 export const PRESENTATION_DATE_LABEL = "التاريخ";
 
 export const presentation = {
-  title: "اللغة العربية",
-  subtitle: "هويتها، تطورها، تاريخها، وتأثيرها",
-  team: "فريق ٣ — أنا بالعربي",
-  /** Chapter strip shown under the hero word and in the closing recap. */
+  /**
+   * The presentation's own name, and the largest thing on the cover.
+   *
+   * This is the title the team uses for itself — «أنا بالعربي» is the filename
+   * stem of both source PDFs — so it is the identity of the talk rather than a
+   * summary of its subject. `subtitle` carries the subject.
+   */
+  title: "أنا بالعربي",
+  subtitle: "اللغة العربية بين الهوية والمعرفة والمستقبل",
+  team: "غيث",
+  /** The Latin spelling of the team name, as set in the logo. */
+  teamLatin: "GHAITH",
+  /** Chapter strip shown on the cover and again in the closing recap. */
   pillars: ["الهوية", "العلم", "المستقبل"] as const,
   heroLine: "من الهوية... إلى العلم... إلى المستقبل",
-  heroQuestion: "ما معنى كلمة عربية؟",
-  duration: "~ ٦ دقائق",
+  duration: "نحو ٦ دقائق",
   date: PRESENTATION_DATE,
   dateLabel: PRESENTATION_DATE_LABEL,
 } as const;
@@ -107,6 +128,15 @@ export type Section = {
   /** Displayed chapter number, e.g. "٠١". */
   numeral: string;
   kicker: string;
+  /**
+   * The question the chapter opens on, under the masthead.
+   *
+   * The title names the subject; this asks the question that makes the room
+   * want it. They are separate because they are read at different moments and
+   * do different work — see the note on `SectionHeader`'s `hook`. Absent on the
+   * chapters that have no opening question worth asking.
+   */
+  hook?: string;
   speaker: string;
   /**
    * Cover presenter. The author of this data is never mutated at runtime — the
@@ -129,8 +159,8 @@ export const sections: Section[] = [
     shortTitle: "الهوية",
     numeral: "٠١",
     kicker: "لماذا العربية هوية؟",
-    speaker: "أ بتول ياسر",
-    speakerBackup: "أ ولاء",
+    speaker: "أ. بتول ياسر",
+    speakerBackup: "أ. ولاء",
     durationSeconds: SECTION_DURATION_SECONDS,
     notes: {
       anchor: "العربية ليست لغة تواصل فقط — إنها جزء من الهوية.",
@@ -152,8 +182,9 @@ export const sections: Section[] = [
     shortTitle: "التكنولوجيا",
     numeral: "٠٢",
     kicker: "العربية في زمن التطور",
-    speaker: "أ عبد الرحمن سامح",
-    speakerBackup: "أ ولاء",
+    hook: "العربية أقدم من كل ما نعرفه عنها… فكيف تحافظ على حضورها في عصر التكنولوجيا والإنترنت؟",
+    speaker: "أ. عبدالرحمن سامح",
+    speakerBackup: "أ. ولاء",
     durationSeconds: SECTION_DURATION_SECONDS,
     notes: {
       anchor: "الحفاظ على العربية لا يعني تجميدها.",
@@ -175,8 +206,9 @@ export const sections: Section[] = [
     shortTitle: "مفاجآت",
     numeral: "٠٣",
     kicker: "هل تعلم؟",
-    speaker: "أ/ حنين حسن",
-    speakerBackup: "أ ولاء",
+    hook: "نظن أننا نعرف العربية… فماذا قد يفاجئنا عنها؟",
+    speaker: "أ. حنين حسن",
+    speakerBackup: "أ. ولاء",
     durationSeconds: SECTION_DURATION_SECONDS,
     notes: {
       anchor: "ثلاث حقائق تكسر التوقّع.",
@@ -198,8 +230,9 @@ export const sections: Section[] = [
     shortTitle: "التاريخ",
     numeral: "٠٤",
     kicker: "من الجذور إلى العالم",
-    speaker: "أ أنور السادات",
-    speakerBackup: "أ ولاء",
+    hook: "كيف تحولت العربية من لغةٍ عريقة إلى لغةٍ للعلم والحضارة والتأثير؟",
+    speaker: "أ. أنور السادات",
+    speakerBackup: "أ. ولاء",
     durationSeconds: SECTION_DURATION_SECONDS,
     notes: {
       anchor: "العربية لغة للعلم والحضارة، وأثرها وصل إلى أوروبا.",
@@ -217,6 +250,66 @@ export const sections: Section[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
+/*  Stage 00 — The cover                                                       */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The cover — the first thing the room sees, and the only stage that does not
+ * hand the floor to a speaker.
+ *
+ * It carries no claim about the subject. It is the title card: who is
+ * standing, what the talk is called, and the three movements it will travel
+ * through. `pillars` and `line` are read off `presentation` rather than
+ * retyped, so the cover and the closing can never disagree about them, and
+ * `chapters` is derived from `sections` so a fifth chapter would appear here on
+ * its own.
+ */
+export const cover = {
+  /** Small label above the title. */
+  kicker: "عرض تقديمي",
+  /**
+   * The talk's name. The room should be able to repeat it afterwards, so it is
+   * set at display size and nothing is allowed to compete with it — the date
+   * and the running time are deliberately the smallest type on the screen.
+   */
+  title: presentation.title,
+  /** One line naming the subject, under the title and nothing louder. */
+  subtitle: presentation.subtitle,
+  /** The team, as the logo sets it. */
+  team: presentation.team,
+  teamLatin: presentation.teamLatin,
+  /** The one line that frames everything that follows. */
+  line: presentation.heroLine,
+  /** The three movements of the talk, in order. */
+  pillars: presentation.pillars,
+  /** The four chapters, named as the progress rail names them. */
+  chapters: sections.map((s) => s.shortTitle) as readonly string[],
+  /** Bottom-right metadata. Secondary on purpose. */
+  duration: presentation.duration,
+  chapterCount: `${toArabicDigits(sections.length)} محاور`,
+  date: presentation.date,
+  cta: "ابدأ العرض",
+} as const;
+
+/**
+ * Notes for the cover.
+ *
+ * The cover is the one stage where the best thing the presenter can do is
+ * nothing, and the notes say so — a speaker who starts talking over the title
+ * has already lost the room's attention before the first question.
+ */
+export const coverNotes: PresenterNotes = {
+  anchor: "اترك الغلاف مكشوفاً — لا تتكلم فوق عنوانك.",
+  pacing: "ثانيتان للوقوف، خمس ثوانٍ صمت، ثم انتقال.",
+  cues: [
+    "تأكد أن الصوت والإضاءة يعملان قبل أن تبدأ.",
+    "الغلاف يعمل وحده — لا حاجة لتعليق.",
+    "انتقل بسهم واحد فقط: الغلاف ← سؤال الافتتاح.",
+    "لا تعد إلى الغلاف بعد بداية العرض.",
+  ],
+};
+
+/* -------------------------------------------------------------------------- */
 /*  Stage 01 — Identity                                                       */
 /* -------------------------------------------------------------------------- */
 
@@ -230,20 +323,41 @@ export const identityPoints: InfoPoint[] = [
       "اصطفى الله العربية من بين اللغات لتكون لغة كتابه العظيم، ولتنزل بها الرسالة الخاتمة.",
     icon: "book",
   },
-  {
-    id: "root",
-    index: "٠٢",
-    label: "امتداد تاريخي",
-    headline: "قدمتها لا تُنسى",
-    detail:
-      "ظهرت منذ نحو ٢٩ قرناً، ورغم هذا القدم ما زالت تحتفظ بتاريخها اللغوي والنحوي.",
-    icon: "clock",
-  },
+    {
+      id: "root",
+      index: "٠٢",
+      label: "امتداد تاريخي",
+      // Was «قدمتها لا تُنسى», then «٢٩ قرناً». The first is the speaker's own
+      // phrase rather than a fact, so it should never have been a headline; the
+      // second was a second statement of what the point's own visual already
+      // showed as a typographic specimen, and the number appeared twice on one
+      // screen.
+      //
+      // The figure now lives in exactly one place — the visual — and the
+      // headline carries what the figure *means* instead: that an old language
+      // can still be a careful one. The "as stated in the material" caveat
+      // stays in the point's presenter notes.
+      headline:
+        "ورغم هذا القدم ما زالت تحتفظ بتاريخها اللغوي والنحوي.",
+      detail:
+        "ظهرت منذ نحو ٢٩ قرناً، ورغم هذا القدم ما زالت تحتفظ بتاريخها اللغوي والنحوي.",
+      icon: "clock",
+    },
+
   {
     id: "poetry",
     index: "٠٣",
     label: "لغة الشعر والأدب",
-    headline: "بلاغة وتعدد معانٍ",
+    // Was «بلاغة وتعدد معانٍ», which repeated two of the four words the point's
+    // beats graphic lists, and the point's own title listed three of them
+    // again — so الشعر/الأدب/البلاغة/تعدد المعاني reached the audience three
+    // times on a single screen.
+    //
+    // The list is now stated once, in the visual. The headline gives the
+    // consequence — that Arabic was a language people *read*, not only spoke —
+    // which is a different claim and does not repeat the list.
+    headline:
+      "على مدى العصور كانت العربية لغةً تُقرأ لما فيها، لا لمجرّد التخاطب.",
     detail:
       "على مدى العصور كانت العربية لغة الشعر والأدب بفروعه المتنوعة، لبلاغتها وتعدد معانيها.",
     icon: "feather",
@@ -434,21 +548,38 @@ export type TimelineEra = {
   detail: string;
 };
 
+/**
+ * The chronological spine of section 04.
+ *
+ * Two rules shape this list.
+ *
+ * **No invented dates.** The handout gives an order, not a calendar, so `period`
+ * is a span or an event ("مع الفتوحات", "عهد المأمون") and never a year. The
+ * visual progression is carried by `index` and by the rail, not by dates we
+ * would have had to make up.
+ *
+ * **No repeated content.** An earlier draft had three consecutive eras whose
+ * `detail` all said some form of «صارت العربية لغة للعلم والثقافة والترجمة»,
+ * and two that both closed with «ازدهرت علوم النحو والصرف والبلاغة». Each era
+ * below therefore contributes exactly one new idea: where it came from, when it
+ * became official, what it was used for, who supported it, what came in, and
+ * where it went.
+ */
 export const timelineEras: TimelineEra[] = [
   {
     id: "roots",
     index: "٠١",
-    title: "الجذور القديمة",
+    title: "الجذور",
     period: "أقدم المراحل",
     detail:
-      "العربية واحدة من أعرق اللغات في التاريخ، ولها جذور قديمة في شبه الجزيرة العربية والشام والحجاز.",
+      "من أعرق اللغات، ولها جذور قديمة في الجزيرة والشام والحجاز.",
   },
   {
     id: "pre-islam",
     index: "٠٢",
     title: "ما قبل الإسلام",
     period: "قرون طويلة",
-    detail: "تطورت وانتشرت عبر قرون طويلة قبل الإسلام.",
+    detail: "تطورت وانتشرت حتى صارت لغة التخاطب الأولى في الجزيرة.",
   },
   {
     id: "islam",
@@ -456,52 +587,78 @@ export const timelineEras: TimelineEra[] = [
     title: "ظهور الإسلام",
     period: "مع الفتوحات",
     detail:
-      "انتشرت العربية بشكل كبير، وأصبحت لغة القرآن الكريم ولغة رسمية في كثير من الدول.",
+      "انتشرت انتشاراً واسعاً، وصارت لغة القرآن ولغة رسمية في دول كثيرة.",
   },
   {
     id: "umayyad",
     index: "٠٤",
     title: "العصر الأموي",
-    period: "من العصر الأموي فصاعداً",
-    detail: "في العصر الأموي والعباسي صارت العربية لغة للعلم والثقافة والترجمة.",
+    period: "من الأموي فصاعداً",
+    detail: "بدأت مكانتها العلمية تتّضح، وأصبحت لغة الكتابة والدواوين.",
   },
   {
     id: "abbasid",
     index: "٠٥",
     title: "العصر العباسي",
-    period: "خصوصاً عهد المأمون",
+    period: "عهد المأمون",
     detail:
-      "وفي عهد المأمون صارت العربية لغة للعلم والثقافة والترجمة، وازدهرت علوم النحو والصرف والبلاغة.",
+      "في عهد المأمون صارت بيتًا للحكمة، فازدهر النحو والصرف والبلاغة.",
   },
   {
     id: "translation",
     index: "٠٦",
-    title: "الترجمة والعلوم",
-    period: "اليونان وفارس والهند",
-    detail: "تُرجمت إلى العربية علوم اليونان وفارس والهند، فازدهرت علوم النحو والصرف والبلاغة.",
+    title: "حركة الترجمة",
+    period: "اليونان · فارس · الهند",
+    detail: "نُقلت علوم اليونان وفارس والهند إلى العربية.",
   },
   {
     id: "europe",
     index: "٠٧",
-    title: "انتقال التأثير إلى أوروبا",
+    title: "إلى أوروبا",
     period: "إلى اللغات الأوروبية",
     detail:
-      "تعلم بعض العلماء والطلاب الأوروبيين العربية للاستفادة من علومها، وانتقلت إلى اللغات الأوروبية كلمات ومصطلحات ذات أصل عربي.",
+      "تعلّم علماء وطلاب الأوروبيين العربية، وانتقلت معها كلماتها إلى لغاتهم.",
   },
 ];
 
-export type InfluenceWord = { word: string; index: string };
+export type InfluenceWord = {
+  /** The loanword, set in Latin script — this is the point of the slide. */
+  word: string;
+  index: string;
+  /**
+   * The familiar Arabic term for the same thing.
+   *
+   * A gloss the audience already knows, not a second etymological claim: the
+   * handout lists the four words and nothing about where each one was
+   * transmitted, so nothing here goes beyond it.
+   */
+  meaning: string;
+};
 
 export const influenceWords: InfluenceWord[] = [
-  { word: "Algebra", index: "٠١" },
-  { word: "Alchemy", index: "٠٢" },
-  { word: "Algorithm", index: "٠٣" },
-  { word: "Alcohol", index: "٠٤" },
+  { word: "Algebra", index: "٠١", meaning: "الجبر" },
+  { word: "Alchemy", index: "٠٢", meaning: "الكيمياء" },
+  { word: "Algorithm", index: "٠٣", meaning: "الخوارزمية" },
+  { word: "Alcohol", index: "٠٤", meaning: "الكحول" },
 ];
 
 export const historyClosing = {
-  lead: "لم تكن العربية مجرد لغة للتواصل، بل كانت أيضاً لغة للعلم والحضارة.",
+  lead: "لم تكن العربية لغة تواصل فحسب، بل لغة علم وحضارة.",
   tail: "وكان لها تأثير واضح في تاريخ المعرفة الإنسانية.",
+  /**
+   * What the last point is *for*, in the team's words.
+   *
+   * This point shows four Latin loanwords, and until now its on-screen line
+   * was `lead` — "Arabic was a language of science and civilisation", which is
+   * a true and already-made claim, made two eras earlier in the same timeline,
+   * and which says nothing about why an audience is looking at *Algebra* and
+   * *Alcohol* on a slide about Arabic. The words on screen are the evidence;
+   * the sentence above them has to name what the evidence shows.
+   *
+   * So the line is now the effect itself, and `lead` moves to `onScreen` where
+   * it is read as intent rather than printed as a heading.
+   */
+  influence: "الكلمة انتقلت إلى اللغات الأوروبية.",
 } as const;
 
 export const historyArtwork = {
@@ -536,8 +693,21 @@ export const behindTask = {
   requirement:
     "إقناع شخصين على الأقل بتغيير اسم Facebook من الإنجليزية إلى العربية، مع التقاط لقطة شاشة قبل التغيير ولقطة بعده.",
   evidenceNote: "كل زوج صور هنا لحساب واحد: الصورة الأولى بالاسم الإنجليزي، والثانية بعد تغييره.",
-  deadlineLabel: "موعد التسليم",
-  deadline: "غداً الساعة ٩ مساءً",
+  /**
+   * Why the exercise was worth doing at all.
+   *
+   * This replaced the submission deadline, which was on this stage until the
+   * brief changed. Two reasons it should not have been there: a date is
+   * production information that stops meaning anything the moment the talk is
+   * given again, and it was taking the position of the argument. The stage was
+   * answering «when is this due?» in the same visual weight as «what was the
+   * point?» — and the screenshots next to it do the answering, not a calendar.
+   *
+   * Kept to one sentence and kept as a question. It is the deck's own argument
+   * turned back on the audience, and it is the reason the exercise exists.
+   */
+  purpose:
+    "إذا كانت اللغة جزءاً من هويتنا، فلماذا نخفيها خلف اسمٍ أجنبي على منصاتنا الرقمية؟",
 } as const;
 
 /** No clock on this stage: it is walked at the presenter's own pace. */
@@ -550,7 +720,7 @@ export const behindNotes: PresenterNotes = {
     "وضّح أن كل حالة عبارة عن لقطتين: قبل وبعد، للحساب نفسه.",
     "امشِ بين الحالات بهدوء — اضغط على أي صورة لتكبيرها إن لزم.",
     "لا تعطِ عدداً للأشخاص: هذه لقطات، وليست إحصاء.",
-    "اختم بالموعد: غداً الساعة التاسعة مساءً.",
+    "اقرأ جملة الغرض بتمهّل، واتركها معلّقة — لا تنتقل فوراً.",
   ],
 };
 
@@ -584,6 +754,7 @@ export const evidencePairs: EvidencePair[] = [
   { n: "٠٧", file: "evidence-07", from: ["img-012-019", "img-012-020"] },
   { n: "٠٨", file: "evidence-08", from: ["img-013-021", "img-013-022"] },
   { n: "٠٩", file: "evidence-09", from: ["img-014-023", "img-014-024"] },
+  { n: "١٠", file: "evidence-10", from: ["img-015-025", "img-015-026"] },
 ].map(({ n, file, from: [beforeFrom, afterFrom] }) => ({
   id: file,
   index: n,
@@ -613,6 +784,12 @@ export type CreditGroup = {
   members: string[];
 };
 
+export type CreditRole = {
+  id: string;
+  label: string;
+  members: string[];
+};
+
 /**
  * Contributions are grouped by the work done, not alphabetical. The grouping
  * is the team's own; no role is invented for a person the material does not
@@ -621,28 +798,75 @@ export type CreditGroup = {
 export const creditGroups: CreditGroup[] = [
   {
     id: "identity",
-    label: "بحث وتجهيز شرائح الهوية",
-    members: ["أ رنا", "أ بسنت", "أ نور"],
+    label: "بحث وكتابة",
+    members: ["أ. رنا", "أ. بسنت", "أ. نور"],
   },
   {
     id: "kinship",
-    label: "بحث وتجهيز شرائح صلة العربية بعالمها",
-    members: ["أ عبدالرحمن", "أ أنور", "أ ولاء"],
+    label: "بحث وكتابة",
+    members: ["أ. عبدالرحمن", "أ. أنور", "أ. ولاء"],
   },
   {
     id: "history",
-    label: "بحث وتجهيز شرائح التاريخ",
-    members: ["أ حنين", "أ رنا", "أ بسنت"],
+    label: "بحث وكتابة",
+    members: ["أ. حنين", "أ. رنا", "أ. بسنت"],
   },
   {
     id: "facts",
-    label: "بحث وتجهيز شرائح المعلومات المفاجئة",
-    members: ["أ حبيبة", "أ بتول", "أ مروة"],
+    label: "بحث وكتابة",
+    members: ["أ. حبيبة", "أ. بتول", "أ. مروة"],
   },
   {
     id: "handout",
-    label: "التقديم وتجهيز الهانداوت",
-    members: ["أ بتول", "أ رنا", "أ بسنت"],
+    label: "البرزنتيشن والهانداوت",
+    members: ["أ. بتول", "أ. رنا", "أ. بسنت"],
+  },
+];
+
+/**
+ * Grouped by role, the way the team describes the work on stage.
+ *
+ * `creditGroups` above keeps the *per-section* breakdown because the handout
+ * needs to know who covered which chapter. This is the coarser view the credits
+ * stage shows: the room does not need to know which of the three people on the
+ * research team wrote the history slides, only that the research happened and
+ * who was in it.
+ *
+ * The Facebook-account task is listed separately because it was delivered as
+ * campaign work rather than as part of the slides, and it would disappear
+ * entirely inside a research grouping.
+ */
+export const creditRoles: CreditRole[] = [
+  {
+    id: "research",
+    label: "البحث والكتابة",
+    members: [
+      "أ. رنا",
+      "أ. بسنت",
+      "أ. نور",
+      "أ. عبدالرحمن",
+      "أ. أنور",
+      "أ. ولاء",
+      "أ. حنين",
+      "أ. حبيبة",
+      "أ. بتول",
+      "أ. مروة",
+    ],
+  },
+  {
+    id: "presentation",
+    label: "العرض",
+    members: ["أ. عبدالرحمن", "أ. حنين", "أ. أنور", "أ. بتول"],
+  },
+  {
+    id: "handout",
+    label: "البرزنتيشن والهانداوت",
+    members: ["أ. بتول", "أ. رنا", "أ. بسنت"],
+  },
+  {
+    id: "outreach",
+    label: "التوعية / تغيير أسماء حسابات فيسبوك",
+    members: ["أ. رنا", "أ. بسنت", "أ. نور"],
   },
 ];
 
@@ -655,6 +879,13 @@ export const presenterLineup = sections.map((s) => ({
 
 /** The cover presenter for the whole deck. */
 export const teamBackupPresenter = sections[0].speakerBackup;
+
+/** The backup presenter, listed on the credits stage in its own right. */
+export const creditBackup: { id: string; label: string; name: string } = {
+  id: "backup",
+  label: "الاحتياطي",
+  name: teamBackupPresenter,
+};
 
 export const teamNotes: PresenterNotes = {
   anchor: "كل اسم هنا قام على جزء محدد — لا اجتهاد في تقسيم العمل.",
@@ -669,21 +900,84 @@ export const teamNotes: PresenterNotes = {
   ],
 };
 
+/**
+ * The masthead of the credits stage.
+ *
+ * A heading, not a claim: it names what the page below it is. The closing
+ * sentence lives on the closing stage, where it can be the only thing on
+ * screen instead of competing with forty names.
+ */
+export const teamCredits = {
+  headline: "من أعدّ هذا العمل",
+  /** The bridge out of the credits and into the closing stage. */
+  bridge: "ولكل واحدٍ من هذه الأسماء دورٌ في ما وصلتم إليه.",
+} as const;
+
 /* -------------------------------------------------------------------------- */
 /*  Closing                                                                    */
 /* -------------------------------------------------------------------------- */
 
 export const closing = {
-  lead: "العربية ليست فقط لغة الماضي",
-  statements: [
-    "لغة هوية",
-    "لغة علم",
-    "لغة معرفة",
-    "لغة قادرة على مواكبة المستقبل",
-  ],
-  /** Optional footer line. Left empty rather than inventing a slogan. */
-  coda: "",
+  /**
+   * The last thing the room reads.
+   *
+   * The previous closing made a claim about the language and then asked the
+   * audience a small task question («كم كلمة ستضيفون هذا الأسبوع؟»). That is a
+   * call to action, and it lands as one more thing to be graded on the way out
+   * of a short talk.
+   *
+   * This one turns the claim back on the people in the room: the statement
+   * establishes that Arabic can carry the future, and the question asks whether
+   * *they* will be part of it. Same length, but it ends as an invitation rather
+   * than a homework assignment — which is what a closing line is for.
+   */
+  statement: "العربية قادرة على مواكبة المستقبل…",
+  /** The question the room carries out. The largest type on the stage. */
+  question: "فهل نكون نحن جزءاً من هذا المستقبل؟",
+  /**
+   * How the pair breaks on the stage.
+   *
+   * `statementLines` sets the claim in two beats so the eye lands on
+   * «مواكبة المستقبل» before the question asks anything. `questionLines` keeps
+   * the question to two lines, which is as wide as it can be before the Arabic
+   * starts breaking mid-phrase.
+   */
+  statementLines: ["العربية قادرة", "على مواكبة المستقبل…"] as const,
+  questionLines: ["فهل نكون نحن", "جزءاً من هذا المستقبل؟"] as const,
+  /**
+   * The thank-you. It sits *under* the statement rather than leading the stage:
+   * the closing line is what the room repeats on the way out, and leading with
+   * gratitude would make the last impression a pleasantry instead of a question.
+   */
+  thanks: "شكر لحسن الاستماع",
+  /**
+   * The short form the speaker says out loud as the stage changes — the same
+   * warmth in the length a person can actually say.
+   */
+  thanksSpoken: "شكراً لكم على حسن استماعكم.",
+  /** Small label above the statement, tying it back to the cover. */
+  kicker: "الخلاصة",
 } as const;
+
+/**
+ * Notes for the closing stage.
+ *
+ * Written as a short reading order rather than a script, because the order is
+ * the only thing that can go wrong here: gratitude first, then the claim, then
+ * the ask, then silence. Getting that sequence right is worth more than
+ * memorising a paragraph.
+ */
+export const closingNotes: PresenterNotes = {
+  anchor: "الجملة، ثم السؤال، ثم الشكر — بهذا الترتيب.",
+  pacing: "الجملة (١٠ث)، السؤال (١٠ث) ثم اصمت، ثم الشكر (٥ث)، ثم افتح باب الأسئلة.",
+  cues: [
+    `اقرأ الجملة كما هي: ${closing.statement}`,
+    `ثم اصمت، واطرح السؤال: ${closing.question}`,
+    "اترك الصمت بعد السؤال — هو الجزء المهم، لا الفراغ قبله.",
+    `ثم اشكر: ${closing.thanksSpoken}`,
+    "لا تعُد إلى شريحة الفريق — الختام هو الختام.",
+  ],
+};
 
 /* -------------------------------------------------------------------------- */
 /*  Stage index (order matters)                                               */
@@ -691,13 +985,14 @@ export const closing = {
 
 export type StageDefinition = {
   id: string;
-  kind: "cover" | "section" | "extra" | "closing";
+  kind: "cover" | "opening" | "section" | "extra" | "closing";
   sectionId?: string;
   label: string;
 };
 
 export const stages: StageDefinition[] = [
-  { id: "cover", kind: "cover", label: "المقدمة" },
+  { id: "cover", kind: "cover", label: "المقدّمة" },
+  { id: "opening", kind: "opening", label: "سؤال الافتتاح" },
   ...sections.map<StageDefinition>((s) => ({
     id: s.id,
     kind: "section",
@@ -705,8 +1000,8 @@ export const stages: StageDefinition[] = [
     label: s.shortTitle,
   })),
   { id: "behind", kind: "extra", label: behindTask.title },
-  { id: "team", kind: "extra", label: "فريق العمل" },
-  { id: "closing", kind: "closing", label: "الخلاصة" },
+  { id: "ghaith", kind: "extra", label: "فريق غيث" },
+  { id: "closing", kind: "closing", label: closing.kicker },
 ];
 
 export const SECTION_IDS = sections.map((s) => s.id);
@@ -716,11 +1011,23 @@ export const SECTION_IDS = sections.map((s) => s.id);
 /* -------------------------------------------------------------------------- */
 
 /*
- * Every claim above is traceable to the team's handout. Where the source is
- * vague, the wording is kept vague — the "٢٩ قرناً" figure is reported as a
- * span, never as a dated year, and the Maltese / Aldebaran / Al-ʿAyn entries
- * deliberately carry no extra history beyond what the handout states (no
- * Sicily, no "oldest dictionary" claim, no extra naming theory). The one line
- * not present in the source is `techTakeaway`, which is flagged in code as a
- * stage summary rather than quoted material.
+ * Every factual claim above is traceable to the team's handout. Where the
+ * source is vague, the wording is kept vague — the "٢٩ قرناً" figure is
+ * reported as a span, never as a dated year, and the Maltese / Aldebaran /
+ * Al-ʿAyn entries deliberately carry no extra history beyond what the handout
+ * states (no Sicily, no "oldest dictionary" claim, no extra naming theory).
+ *
+ * Three kinds of line here are *not* from the handout, and each is flagged in
+ * place so nobody has to guess which is which:
+ *
+ *   - `techTakeaway` — a stage summary, labelled as written for the stage.
+ *   - `cover` and everything under `closing` (including `thanks` and `coda`) —
+ *     presentation copy. The deck's own words about itself, and the only lines
+ *     on the last stage that are not somebody else's quotation.
+ *   - `coverNotes` / `closingNotes` / `teamCredits` — presenter directions.
+ *     They are read by the speaker, not the audience, so they make no claims to
+ *     anyone.
+ *
+ * The audience warm-up lives in `data/handoff.ts` instead, together with its
+ * own note on the one claim in it that still needs the team's confirmation.
  */
