@@ -96,7 +96,7 @@ export function FiligreeRule({ className }: { className?: string }) {
       aria-hidden
       className={cn("flex items-center gap-2 text-gold-400", className)}
     >
-      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-gold-400/50" />
+      <span className="h-px flex-1 bg-linear-to-l from-transparent to-gold-400/50" />
       <svg width="9" height="9" viewBox="0 0 9 9" className="shrink-0">
         <path
           d="M4.5 0 L9 4.5 L4.5 9 L0 4.5 Z"
@@ -105,7 +105,7 @@ export function FiligreeRule({ className }: { className?: string }) {
           strokeWidth="0.9"
         />
       </svg>
-      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-gold-400/50" />
+      <span className="h-px flex-1 bg-linear-to-r from-transparent to-gold-400/50" />
     </div>
   );
 }
@@ -177,7 +177,7 @@ export function CoverMotif({
       <motion.svg
         viewBox="0 0 400 400"
         className={cn(
-          "absolute start-1/2 top-1/2 h-[min(150%,145vw)] w-[min(150%,145vw)] -translate-x-1/2 -translate-y-1/2",
+          "absolute inset-s-1/2 top-1/2 h-[min(150%,145vw)] w-[min(150%,145vw)] -translate-x-1/2 -translate-y-1/2",
           veil,
         )}
         fill="none"

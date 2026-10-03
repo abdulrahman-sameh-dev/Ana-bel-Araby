@@ -75,7 +75,7 @@ export function PointVisual({
       return (
         <blockquote
           className={cn(
-            "ornament-frame relative overflow-hidden rounded-lg px-[clamp(1rem,0.7rem+0.9vw,1.6rem)] py-[var(--sp-block)]",
+            "ornament-frame relative overflow-hidden rounded-lg px-[clamp(1rem,0.7rem+0.9vw,1.6rem)] py-(--sp-block)",
             "bg-ink text-paper",
             className,
           )}
@@ -99,7 +99,7 @@ export function PointVisual({
       return (
         <div
           className={cn(
-            "ornament-frame rounded-lg px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-[var(--sp-block)]",
+            "ornament-frame rounded-lg px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-(--sp-block)",
             isNight ? "bg-night-raised" : "bg-paper-raised",
             className,
           )}
@@ -184,7 +184,7 @@ export function PointVisual({
             <li
               key={w.word}
               className={cn(
-                "rounded-lg border px-[clamp(0.5rem,0.35rem+0.4vw,0.9rem)] py-[var(--sp-tight)] text-center",
+                "rounded-lg border px-[clamp(0.5rem,0.35rem+0.4vw,0.9rem)] py-(--sp-tight) text-center",
                 isNight
                   ? "border-gold-300/35 bg-night-raised"
                   : "border-gold-400/45 bg-paper-raised",
@@ -231,7 +231,7 @@ export function PointVisual({
       return (
         <div
           className={cn(
-            "ornament-frame rounded-lg px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-[var(--sp-block)]",
+            "ornament-frame rounded-lg px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-(--sp-block)",
             isNight ? "bg-night-raised" : "bg-paper-raised",
             className,
           )}

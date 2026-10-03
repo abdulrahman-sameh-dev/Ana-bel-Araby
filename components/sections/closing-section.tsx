@@ -88,9 +88,9 @@ export function ClosingSection({ onRestart }: { onRestart: () => void }) {
           />
         </motion.div>
 
-        <FiligreeRule className="mt-[var(--sp-block)] w-40" />
+        <FiligreeRule className="mt-(--sp-block) w-40" />
 
-        <p className="kicker mt-[var(--sp-tight)] text-gold-600">
+        <p className="kicker mt-(--sp-tight) text-gold-600">
           {closing.kicker}
         </p>
 
@@ -122,7 +122,7 @@ export function ClosingSection({ onRestart }: { onRestart: () => void }) {
           initial={reduced ? false : { opacity: 0, y: 14 }}
           animate={complete ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
           transition={{ duration: reduced ? 0.001 : 0.6, delay: reduced ? 0 : 0.12, ease: EASE }}
-          className="stage-title mt-[var(--sp-tight)] flex flex-col items-center text-balance text-ink"
+          className="stage-title mt-(--sp-tight) flex flex-col items-center text-balance text-ink"
         >
           {closing.questionLines.map((line) => (
             <span
@@ -139,7 +139,7 @@ export function ClosingSection({ onRestart }: { onRestart: () => void }) {
           initial={reduced ? false : { opacity: 0, y: 8 }}
           animate={complete ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
           transition={{ duration: reduced ? 0.001 : 0.5, delay: reduced ? 0 : 0.24, ease: EASE }}
-          className="mt-[var(--sp-block)] flex items-center gap-2 type-body-lg font-semibold text-gold-600"
+          className="mt-(--sp-block) flex items-center gap-2 type-body-lg font-semibold text-gold-600"
         >
           <HeartHandshake className="size-4 shrink-0" aria-hidden />
           {closing.thanks}
@@ -150,7 +150,7 @@ export function ClosingSection({ onRestart }: { onRestart: () => void }) {
           initial={reduced ? false : { opacity: 0 }}
           animate={complete ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: reduced ? 0.001 : 0.5, delay: reduced ? 0 : 0.2, ease: EASE }}
-          className="mt-[var(--sp-block)] flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5"
+          className="mt-(--sp-block) flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5"
         >
           {presentation.pillars.map((pillar, i) => (
             <li key={pillar} className="flex items-center gap-3">
@@ -178,10 +178,10 @@ export function ClosingSection({ onRestart }: { onRestart: () => void }) {
           initial={reduced ? false : { opacity: 0 }}
           animate={complete ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: reduced ? 0.001 : 0.5, delay: reduced ? 0 : 0.26, ease: EASE }}
-          className="mt-[var(--sp-block)] w-full"
+          className="mt-(--sp-block) w-full"
         >
           <FiligreeRule className="mx-auto w-full max-w-md" />
-          <ul className="mt-[var(--sp-tight)] grid grid-cols-2 gap-x-2 gap-y-1.5 sm:grid-cols-4">
+          <ul className="mt-(--sp-tight) grid grid-cols-2 gap-x-2 gap-y-1.5 sm:grid-cols-4">
             {sections.map((section) => (
               <li key={section.id} className="min-w-0">
                 <p
@@ -203,7 +203,7 @@ export function ClosingSection({ onRestart }: { onRestart: () => void }) {
           initial={reduced ? false : { opacity: 0, y: 10 }}
           animate={complete ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
           transition={{ duration: reduced ? 0.001 : 0.5, delay: reduced ? 0 : 0.32, ease: EASE }}
-          className="mt-[var(--sp-block)] flex flex-col items-center gap-2.5"
+          className="mt-(--sp-block) flex flex-col items-center gap-2.5"
         >
           <button
             type="button"

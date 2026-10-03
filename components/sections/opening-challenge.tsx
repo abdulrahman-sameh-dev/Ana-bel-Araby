@@ -160,7 +160,7 @@ export function OpeningChallenge({
                       thing the card exists to prevent. */}
                   <span
                     aria-hidden={flipped}
-                    className="ornament-frame relative flex h-full flex-col items-center justify-center gap-4 rounded-lg bg-paper-raised px-[clamp(1.25rem,0.6rem+2vw,2.5rem)] py-[clamp(1.25rem,1rem+1.5vh,2rem)] shadow-lift [backface-visibility:hidden]"
+                    className="ornament-frame relative flex h-full flex-col items-center justify-center gap-4 rounded-lg bg-paper-raised px-[clamp(1.25rem,0.6rem+2vw,2.5rem)] py-[clamp(1.25rem,1rem+1.5vh,2rem)] shadow-lift backface-hidden"
                     style={{ transform: "rotateY(0deg)" }}
                   >
                     <TeamMark variant="emblem" className="size-60 my-10 shrink-0 opacity-80" />
@@ -174,7 +174,7 @@ export function OpeningChallenge({
 
                   <span
                     aria-hidden={!flipped}
-                    className="absolute inset-0 flex min-h-[clamp(15rem,11rem+14vh,20rem)] flex-col items-center justify-center gap-3 rounded-lg bg-ink px-[clamp(1.25rem,0.6rem+2vw,2.5rem)] py-[clamp(1.25rem,1rem+1.5vh,2rem)] shadow-lift [backface-visibility:hidden]"
+                    className="absolute inset-0 flex min-h-[clamp(15rem,11rem+14vh,20rem)] flex-col items-center justify-center gap-3 rounded-lg bg-ink px-[clamp(1.25rem,0.6rem+2vw,2.5rem)] py-[clamp(1.25rem,1rem+1.5vh,2rem)] shadow-lift backface-hidden"
                     style={{ transform: "rotateY(180deg)" }}
                   >
                     <span className="kicker text-gold-200">سؤال</span>
@@ -197,7 +197,7 @@ export function OpeningChallenge({
               >
                 {/* The answer, exactly as the team wrote it. */}
                 {hasAnswer ? (
-                  <div className="ornament-frame relative w-full rounded-lg bg-paper-raised px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-[var(--sp-block)] text-start">
+                  <div className="ornament-frame relative w-full rounded-lg bg-paper-raised px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-(--sp-block) text-start">
                     <span className="kicker text-gold-600">المعنى</span>
                     <span className="scripture mt-1.5 flex flex-col gap-1.5 type-display-sm balance text-ink">
                       {answerLines.map((line) => (
@@ -227,7 +227,7 @@ export function OpeningChallenge({
                   {openingChallenge.connection}
                 </p>
 
-                <p className="ornament-frame type-display-sm balance rounded-lg bg-ink px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-[var(--sp-block)] text-paper">
+                <p className="ornament-frame type-display-sm balance rounded-lg bg-ink px-[clamp(1rem,0.7rem+0.9vw,1.75rem)] py-(--sp-block) text-paper">
                   {openingChallenge.takeaway}
                 </p>
 
@@ -264,7 +264,7 @@ export function OpeningChallenge({
           </AnimatePresence>
 
           {speaker ? (
-            <p className="kicker mt-[var(--sp-tight)] text-ink-faint">
+            <p className="kicker mt-(--sp-tight) text-ink-faint">
               {speaker}
             </p>
           ) : null}

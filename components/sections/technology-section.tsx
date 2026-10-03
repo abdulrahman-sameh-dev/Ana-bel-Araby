@@ -183,7 +183,7 @@ function TechnologyArtwork() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/80 via-transparent to-transparent"
+        className="pointer-events-none absolute inset-0 bg-linear-to-t from-night/80 via-transparent to-transparent"
       />
     </motion.figure>
   );

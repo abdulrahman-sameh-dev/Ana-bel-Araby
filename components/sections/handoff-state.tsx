@@ -86,7 +86,7 @@ export function HandoffState({
             gravity without saying anything. */}
         <div
           className={cn(
-            "mt-[var(--sp-block)] flex items-center justify-center",
+            "mt-(--sp-block) flex items-center justify-center",
             isNight ? "text-night-muted" : "text-gold-600",
           )}
           aria-hidden

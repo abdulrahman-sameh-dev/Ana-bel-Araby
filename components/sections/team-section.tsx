@@ -74,10 +74,10 @@ export function TeamSection({ onContinue }: { onContinue?: () => void }) {
         <SectionHeader
           kicker={`${presentation.team} — ${presentation.dateLabel}`}
           title={teamCredits.headline}
-          className="mt-[var(--sp-tight)]"
+          className="mt-(--sp-tight)"
         />
 
-        <div className="mt-[var(--sp-block)] grid min-h-0 flex-1 grid-cols-1 gap-x-[clamp(1.5rem,1rem+3vw,4rem)] gap-y-[var(--sp-block)] lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+        <div className="mt-(--sp-block) grid min-h-0 flex-1 grid-cols-1 gap-x-[clamp(1.5rem,1rem+3vw,4rem)] gap-y-[var(--sp-block)] lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
           {/* ---------- the work, by role ---------- */}
           <motion.section
             initial={reduced ? false : { opacity: 0, y: 14 }}
@@ -91,7 +91,7 @@ export function TeamSection({ onContinue }: { onContinue?: () => void }) {
             </h2>
             <FiligreeRule className="mt-2 w-full" />
 
-            <dl className="mt-[var(--sp-block)] flex min-h-0 flex-1 flex-col justify-evenly">
+            <dl className="mt-(--sp-block) flex min-h-0 flex-1 flex-col justify-evenly">
               {creditRoles.map((role) => (
                 <div
                   key={role.id}
@@ -132,7 +132,7 @@ export function TeamSection({ onContinue }: { onContinue?: () => void }) {
             </h2>
             <FiligreeRule className="mt-2 w-full" />
 
-            <ul className="mt-[var(--sp-block)] flex flex-col">
+            <ul className="mt-(--sp-block) flex flex-col">
               {presenterLineup.map((person) => (
                 <li
                   key={person.section}
@@ -159,7 +159,7 @@ export function TeamSection({ onContinue }: { onContinue?: () => void }) {
             </ul>
 
             {/* The cover is a role, not a fifth turn at the podium. */}
-            <p className="mt-[var(--sp-block)] flex items-center gap-2.5 rounded-lg border border-gold-400/40 bg-gold-100/50 px-3 py-2">
+            <p className="mt-(--sp-block) flex items-center gap-2.5 rounded-lg border border-gold-400/40 bg-gold-100/50 px-3 py-2">
               <span className="grid size-8 shrink-0 place-items-center rounded-full border border-gold-400/40 bg-paper-raised/70">
                 <LifeBuoy className="size-3.5 text-gold-600" aria-hidden />
               </span>
@@ -177,7 +177,7 @@ export function TeamSection({ onContinue }: { onContinue?: () => void }) {
 
         {/* ── the way out of the credits, into the closing stage. ── */}
         {onContinue ? (
-          <div className="mt-[var(--sp-block)] flex shrink-0 flex-col items-center gap-2.5">
+          <div className="mt-(--sp-block) flex shrink-0 flex-col items-center gap-2.5">
             <p className="type-body balance text-ink-soft">{teamCredits.bridge}</p>
             <button
               type="button"
@@ -195,7 +195,7 @@ export function TeamSection({ onContinue }: { onContinue?: () => void }) {
 
         <footer
           className={cn(
-            "mt-[var(--sp-block)] flex items-center justify-between gap-4 border-t border-paper-line pt-2.5 type-body-sm text-ink-muted",
+            "mt-(--sp-block) flex items-center justify-between gap-4 border-t border-paper-line pt-2.5 type-body-sm text-ink-muted",
           )}
         >
           <span className="font-semibold text-ink">{presentation.team}</span>

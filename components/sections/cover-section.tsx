@@ -98,7 +98,7 @@ export function CoverSection({ onStart }: { onStart: () => void }) {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-paper/80 via-paper/70 to-paper/90"
+        className="pointer-events-none absolute inset-0 bg-linear-to-b from-paper/80 via-paper/70 to-paper/90"
       />
 
       <OrnamentFrame className="inset-4 sm:inset-6" />
@@ -125,7 +125,7 @@ export function CoverSection({ onStart }: { onStart: () => void }) {
 
         <motion.p
           {...rise(0.08)}
-          className="kicker mt-[var(--sp-tight)] text-gold-600"
+          className="kicker mt-(--sp-tight) text-gold-600"
         >
           {cover.kicker}
         </motion.p>
@@ -133,7 +133,7 @@ export function CoverSection({ onStart }: { onStart: () => void }) {
         {/* ── the title. The largest thing on the page, and the only one. ── */}
         <motion.h1
           {...rise(0.14)}
-          className="stage-title mt-[var(--sp-tight)] type-display-xl balance text-ink"
+          className="stage-title mt-(--sp-tight) type-display-xl balance text-ink"
         >
           {cover.title}
         </motion.h1>
@@ -146,7 +146,7 @@ export function CoverSection({ onStart }: { onStart: () => void }) {
           {cover.subtitle}
         </motion.p>
 
-        <motion.div {...rise(0.26)} className="mt-[var(--sp-block)] w-full">
+        <motion.div {...rise(0.26)} className="mt-(--sp-block) w-full">
           <FiligreeRule className="w-full max-w-md" />
         </motion.div>
 
@@ -175,7 +175,7 @@ export function CoverSection({ onStart }: { onStart: () => void }) {
         </motion.ul>
 
         {/* ── the way in. No keyboard hint: that is a note for the presenter. ── */}
-        <motion.div {...rise(0.4)} className="mt-[var(--sp-block)]">
+        <motion.div {...rise(0.4)} className="mt-(--sp-block)">
           <button
             type="button"
             onClick={onStart}
